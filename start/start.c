@@ -29,6 +29,12 @@ void StartGame(){
             }
         }
 
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            PlaceBlock((Vector2 *)blockShapes[currentBlock], blockSize, mx, my, (currentColor.r + currentColor.g + currentColor.b) % 6 + 1);
+            currentBlock = rand() % BLOCK_TYPES;
+            currentColor = blockColors[rand() % 6];
+        }
+
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
 
         EndDrawing();
