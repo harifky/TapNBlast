@@ -2,8 +2,6 @@
 #include "../lib/animation.h"
 #include "../lib/global.h"
 
-
-
 void DrawGrids() {
     // Draw grid background
     DrawRectangleRounded(

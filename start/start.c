@@ -7,7 +7,7 @@ void StartGame(){
     srand(time(NULL));
 
     int currentBlock = rand() % BLOCK_TYPES;
-    int blockSize = MAX_BLOCK_SIZE; // could use custom size per shape
+    int blockSize = MAX_BLOCK_SIZE; 
     Color currentColor = blockColors[rand() % 6];
 
     while (!WindowShouldClose()){
@@ -17,17 +17,25 @@ void StartGame(){
         ClearBackground(PURPLE);
         DrawGrids();
 
+        
         Vector2 mouse = GetMousePosition();
-        int mx = mouse.x / (BLOCK_SIZE + PADDING);
-        int my = mouse.y / (BLOCK_SIZE + PADDING);
+        int mx = (mouse.x - gridOriginX) / TILE_SIZE;
+        int my = (mouse.y - gridOriginY) / TILE_SIZE;
+
 
         for (int i = 0; i < blockSize; i++) {
-            int x = mx + blockShapes[currentBlock][i].x;
-            int y = my + blockShapes[currentBlock][i].y;
-            if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
-                DrawRectangle(x * (BLOCK_SIZE + PADDING), y * (BLOCK_SIZE + PADDING), BLOCK_SIZE, BLOCK_SIZE, Fade(currentColor, 0.5f));
-            }
-        }
+        int x = mx + blockShapes[currentBlock][i].x;
+        int y = my + blockShapes[currentBlock][i].y;
+         if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+        int dx = gridOriginX + x * TILE_SIZE;
+        int dy = gridOriginY + y * TILE_SIZE;
+
+        DrawRectangleRounded(
+            (Rectangle){dx + 1, dy + 1, TILE_SIZE - 2, TILE_SIZE - 2}, 0.3f, 1, Fade(currentColor, 0.5f)
+        );
+    }
+}
+
 
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
 

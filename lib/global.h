@@ -26,7 +26,7 @@
 #define UI_BORDER_SIZE 2
 #define UI_RADIUS 8
 #define MAX_BLOCK_SIZE 9
-#define BLOCK_SIZE 30
+#define BLOCK_SIZE 45
 #define PADDING 2
 #define GRID_WIDTH 10
 #define GRID_HEIGHT 10
