@@ -2,16 +2,6 @@
 #include "../lib/animation.h"
 #include "../lib/global.h"
 
-int grid[GRID_SIZE][GRID_SIZE] = {0};
-
-Color blockColors[6] = { 
-    (Color){ 255, 90, 90, 255 },     // Red
-    (Color){ 255, 150, 50, 255 },    // Orange
-    (Color){ 180, 90, 255, 255 },    // Purple
-    (Color){ 90, 180, 90, 255 },     // Green
-    (Color){ 50, 150, 255, 255 },    // Blue
-    (Color){ 255, 220, 60, 255 }     // Yellow
-};
 
 
 void DrawGrids() {
