@@ -26,7 +26,7 @@
 #define UI_BORDER_SIZE 2
 #define UI_RADIUS 8
 #define MAX_BLOCK_SIZE 9
-#define BLOCK_SIZE 30
+#define BLOCK_SIZE 45
 #define PADDING 2
 #define GRID_WIDTH 10
 #define GRID_HEIGHT 10
@@ -38,13 +38,56 @@
 
 int grid[GRID_SIZE][GRID_SIZE] = {0};
 
-Color blockColors[6] = { 
+
+Color blockColors[BLOCK_TYPES] = { 
     (Color){ 255, 90, 90, 255 },     // Red
     (Color){ 255, 150, 50, 255 },    // Orange
     (Color){ 180, 90, 255, 255 },    // Purple
     (Color){ 90, 180, 90, 255 },     // Green
     (Color){ 50, 150, 255, 255 },    // Blue
-    (Color){ 255, 220, 60, 255 }     // Yellow
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
+    (Color){ 255, 90, 90, 255 },     // Red
+    (Color){ 255, 150, 50, 255 },    // Orange
+    (Color){ 180, 90, 255, 255 },    // Purple
+    (Color){ 90, 180, 90, 255 },     // Green
+    (Color){ 50, 150, 255, 255 },    // Blue
+    (Color){ 255, 220, 60, 255 },     // Yellow
 };
 
 

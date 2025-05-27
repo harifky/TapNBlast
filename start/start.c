@@ -5,34 +5,43 @@ void StartGame(){
     SetTargetFPS(60);
 
     srand(time(NULL));
-
     int currentBlock = rand() % BLOCK_TYPES;
-    int blockSize = MAX_BLOCK_SIZE; // could use custom size per shape
-    Color currentColor = blockColors[rand() % 6];
+    int blockSize = MAX_BLOCK_SIZE;
 
+ 
     while (!WindowShouldClose()){
-
 
         BeginDrawing();
         ClearBackground(PURPLE);
         DrawGrids();
 
         Vector2 mouse = GetMousePosition();
-        int mx = mouse.x / (BLOCK_SIZE + PADDING);
-        int my = mouse.y / (BLOCK_SIZE + PADDING);
+        int mx = (int)((mouse.x - gridOriginX) / TILE_SIZE);
+        int my = (int)((mouse.y - gridOriginY) / TILE_SIZE);
 
+       
         for (int i = 0; i < blockSize; i++) {
             int x = mx + blockShapes[currentBlock][i].x;
-            int y = my + blockShapes[currentBlock][i].y;
+            int y = my + blockShapes[currentBlock][i].y;                         
             if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
-                DrawRectangle(x * (BLOCK_SIZE + PADDING), y * (BLOCK_SIZE + PADDING), BLOCK_SIZE, BLOCK_SIZE, Fade(currentColor, 0.5f));
+                DrawRectangle(
+                    gridOriginX + x * TILE_SIZE, 
+                    gridOriginY + y * TILE_SIZE, 
+                    BLOCK_SIZE, 
+                    BLOCK_SIZE, 
+                    Fade(blockColors[currentBlock], 0.5f) 
+                );
             }
         }
 
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            PlaceBlock((Vector2 *)blockShapes[currentBlock], blockSize, mx, my, (currentColor.r + currentColor.g + currentColor.b) % 6 + 1);
+            Vector2 m = GetMousePosition();
+            int gx = (int)((m.x - gridOriginX) / TILE_SIZE);
+            int gy = (int)((m.y - gridOriginY) / TILE_SIZE);
+            if (gx >= 0 && gx < GRID_SIZE && gy >= 0 && gy < GRID_SIZE) {
+                PlaceBlock(gx, gy, currentBlock+1);
+            }
             currentBlock = rand() % BLOCK_TYPES;
-            currentColor = blockColors[rand() % 6];
         }
 
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
