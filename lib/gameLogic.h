@@ -42,8 +42,6 @@ const Vector2 blockShapes[BLOCK_TYPES][9] = {
 	  {{0,0},{1,0},{2,0},{0,-1},{0,-2}}, 
 };
 
-void PlaceBlock(Vector2 *shape, int count, int gridX, int gridY, int colorIndex);
-boolean HasValidPlacement(int blockType);
-boolean CanPlaceBlock(int centerX, int centerY, int blockType);
+void PlaceBlock(int centerX, int centerY, int blockType);
 
 #endif
