@@ -2,6 +2,7 @@
 #define GAMELOGIC_H
 
 #include "global.h"
+#include "boolean.h"
 
 const Vector2 blockShapes[BLOCK_TYPES][9] = {
 	  {{0,0},{0,1},{0,2},{1,2}},
@@ -42,5 +43,7 @@ const Vector2 blockShapes[BLOCK_TYPES][9] = {
 };
 
 void PlaceBlock(Vector2 *shape, int count, int gridX, int gridY, int colorIndex);
+boolean HasValidPlacement(int blockType);
+boolean CanPlaceBlock(int centerX, int centerY, int blockType);
 
 #endif
