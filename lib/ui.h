@@ -9,4 +9,7 @@
 // UI functions
 void DrawGrids();
 
+//Score
+void DrawScorePanel();
+
 #endif /* UI_H */

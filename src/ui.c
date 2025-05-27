@@ -2,18 +2,6 @@
 #include "../lib/animation.h"
 #include "../lib/global.h"
 
-int grid[GRID_SIZE][GRID_SIZE] = {0};
-
-Color blockColors[6] = { 
-    (Color){ 255, 90, 90, 255 },     // Red
-    (Color){ 255, 150, 50, 255 },    // Orange
-    (Color){ 180, 90, 255, 255 },    // Purple
-    (Color){ 90, 180, 90, 255 },     // Green
-    (Color){ 50, 150, 255, 255 },    // Blue
-    (Color){ 255, 220, 60, 255 }     // Yellow
-};
-
-
 void DrawGrids() {
     // Draw grid background
     DrawRectangleRounded(
@@ -79,4 +67,28 @@ void DrawGrids() {
             }
         }
     }
+}
+
+void DrawScorePanel() {
+    // Draw Score panel
+    DrawRectangleRounded(
+        (Rectangle){10, 10, 140, 85},
+        0.15f,
+        10,
+        UI_PANEL
+    );
+    
+    DrawRectangleRoundedLines(
+        (Rectangle){10, 10, 140, 85},
+        0.15f,
+        10,
+        UI_BORDER
+    );
+    
+    // Draw Score title
+    DrawText("SCORE", 25, 15, 20, UI_TEXT);
+    
+    // Draw Score value with shadow for better visibility
+    DrawText(TextFormat("%d", score), 28, 42, 32, (Color){0, 0, 0, 60});
+    DrawText(TextFormat("%d", score), 25, 40, 32, UI_SCORE_TEXT);
 }
