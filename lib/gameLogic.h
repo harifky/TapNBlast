@@ -43,5 +43,7 @@ const Vector2 blockShapes[BLOCK_TYPES][9] = {
 };
 
 void PlaceBlock(int centerX, int centerY, int blockType);
+boolean HasValidPlacement(int blockType);
+boolean CanPlaceBlock(int centerX, int centerY, int blockType);
 
 #endif
