@@ -11,5 +11,8 @@ void DrawGrids();
 
 //Score
 void DrawScorePanel();
+// GameOver
+
+void DrawGameOverPanel();
 
 #endif /* UI_H */

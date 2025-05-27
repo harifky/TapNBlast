@@ -92,3 +92,9 @@ void DrawScorePanel() {
     DrawText(TextFormat("%d", score), 28, 42, 32, (Color){0, 0, 0, 60});
     DrawText(TextFormat("%d", score), 25, 40, 32, UI_SCORE_TEXT);
 }
+
+void DrawGameOverPanel() {
+    DrawText("GAME OVER!", SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT/2 - 40, 28, (Color){200, 50, 50, 255});
+    DrawText(TextFormat("Final Score: %d", score), SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT/2, 20, UI_TEXT);
+    DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
+}

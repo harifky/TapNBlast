@@ -7,6 +7,7 @@ void StartGame() {
     srand(time(NULL));
     int currentBlock = rand() % BLOCK_TYPES;
     int blockSize = MAX_BLOCK_SIZE;
+    boolean GameOver = true;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -40,12 +41,27 @@ void StartGame() {
             int gx = (int)((m.x - gridOriginX) / TILE_SIZE);
             int gy = (int)((m.y - gridOriginY) / TILE_SIZE);
             if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT) {
-                if (CanPlaceBlock(gx, gy, currentBlock + 1)) {
+                if (CanPlaceBlock(gx, gy, currentBlock + 1) && GameOver) {
                     PlaceBlock(gx, gy, currentBlock + 1);
                     currentBlock = rand() % BLOCK_TYPES;  // Dapatkan blok baru
                     ClearFullLines();
+                    if(!HasValidPlacement(currentBlock+1)) GameOver = false;
                 }
             }
+        }
+        
+        if (!GameOver) {
+            DrawGameOverPanel();
+        }
+        
+        if(!GameOver && IsKeyPressed(KEY_R)){
+            for (int y = 0; y < GRID_SIZE; y++) {
+                for (int x = 0; x < GRID_SIZE; x++) {
+                    grid[y][x] = 0;
+                }
+            }
+            score = 0;
+            GameOver = true;
         }
 
         // Gambar informasi FPS
