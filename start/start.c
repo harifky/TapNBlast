@@ -43,6 +43,7 @@ void StartGame() {
                 if (CanPlaceBlock(gx, gy, currentBlock + 1)) {
                     PlaceBlock(gx, gy, currentBlock + 1);
                     currentBlock = rand() % BLOCK_TYPES;  // Dapatkan blok baru
+                    ClearFullLines();
                 }
             }
         }

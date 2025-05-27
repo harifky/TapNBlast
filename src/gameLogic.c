@@ -36,3 +36,32 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType) {
     }
     return true;
 }
+
+void ClearFullLines(){
+   
+    for (int y = 0; y < GRID_SIZE; y++) {
+        boolean full = true;
+        for (int x = 0; x < GRID_SIZE; x++) {
+            if (grid[y][x] == 0) {
+                full = false;
+                break;
+            }
+        }
+        if (full) {
+            for (int x = 0; x < GRID_SIZE; x++) grid[y][x] = 0;
+        }
+    }
+    
+    for (int x = 0; x < GRID_SIZE; x++) {
+        boolean full = true;
+        for (int y = 0; y < GRID_SIZE; y++) {
+            if (grid[y][x] == 0) {
+                full = false;
+                break;
+            }
+        }
+        if (full) {
+            for (int y = 0; y < GRID_SIZE; y++) grid[y][x] = 0;
+        }
+    }
+}
