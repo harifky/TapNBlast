@@ -3,6 +3,34 @@
 #include "../lib/boolean.h"
 
 
+void Enqueue(int blockType) {
+    QueueNode *newNode = (QueueNode *)malloc(sizeof(QueueNode));
+    newNode->blockType = blockType;
+    newNode->next = NULL;
+    if (queueRear == NULL) {
+        queueFront = queueRear = newNode;
+    } else {
+        queueRear->next = newNode;
+        queueRear = newNode;
+    }
+}
+
+int Dequeue() {
+    if (queueFront == NULL) return -1;
+    int value = queueFront->blockType;
+    QueueNode *temp = queueFront;
+    queueFront = queueFront->next;
+    if (queueFront == NULL) queueRear = NULL;
+    free(temp);
+    return value;
+}
+
+int GetQueue(){
+    QueueNode *current = queueFront;
+    return current->blockType;
+}
+
+
 void PlaceBlock(int centerX, int centerY, int blockType) {
     for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
         int bx = centerX + (int)blockShapes[blockType - 1][i].x;

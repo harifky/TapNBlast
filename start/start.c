@@ -3,11 +3,15 @@
 void StartGame() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
     SetTargetFPS(60);
-
     srand(time(NULL));
-    int currentBlock = rand() % BLOCK_TYPES;
+
+    
     int blockSize = MAX_BLOCK_SIZE;
     boolean GameOver = true;
+
+    for (int i = 0; i < 3; i++) Enqueue(GetRandomValue(1, 40));
+
+    int currentBlock = GetQueue();
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -43,7 +47,9 @@ void StartGame() {
             if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT) {
                 if (CanPlaceBlock(gx, gy, currentBlock + 1) && GameOver) {
                     PlaceBlock(gx, gy, currentBlock + 1);
-                    currentBlock = rand() % BLOCK_TYPES;  // Dapatkan blok baru
+                    Dequeue();
+                    currentBlock = GetQueue(); 
+                    Enqueue(GetRandomValue(1,40));
                     ClearFullLines();
                     if(!HasValidPlacement(currentBlock+1)) GameOver = false;
                 }
@@ -62,6 +68,7 @@ void StartGame() {
             }
             score = 0;
             GameOver = true;
+            while (queueFront != NULL) Dequeue();
         }
 
         // Gambar informasi FPS
