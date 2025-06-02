@@ -16,7 +16,7 @@ void DrawScorePanel();
 void DrawGameOverPanel();
 
 // draw block preview
-void DrawNextBlocks(int selectedIndex);
+void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
 
 void DrawBlockShadow(int cursorX, int cursorY, int blockType);
 

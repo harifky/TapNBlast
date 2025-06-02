@@ -59,6 +59,6 @@ boolean HasValidPlacement(int blockType);
 boolean CanPlaceBlock(int centerX, int centerY, int blockType);
 void ClearFullLines();
 int GetQueueAt(int index);
-
+void ClearQueue();
 
 #endif

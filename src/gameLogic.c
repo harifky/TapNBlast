@@ -147,3 +147,7 @@ int GetQueueSize() {
     }
     return size;
 }
+
+void ClearQueue() {
+    while (Dequeue() != -1);
+}

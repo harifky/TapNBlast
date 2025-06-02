@@ -99,7 +99,7 @@ void DrawGameOverPanel() {
     DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
 }
 
-void DrawNextBlocks(int selectedIndex){
+void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
     // Posisi baru - di bawah grid dan di tengah
     int panelWidth = 370;  // Panel lebih lebar untuk jarak lebih banyak
     int panelHeight = 110; // Panel lebih tinggi untuk blok lebih besar
@@ -129,13 +129,20 @@ void DrawNextBlocks(int selectedIndex){
     int startX = panelX + (panelWidth - 3 * blockSpacing) / 2;
     
     for (int i = 0; i < 3; i++) {
-        int type = GetQueueAt(i); // Menggunakan currentBatch instead of GetQueueAt(i)
+        int type = GetQueueAt(i);
         int blockX = startX + i * blockSpacing;
         int blockY = panelY + 35;
         
-        // Draw slot background - berbeda untuk slot kosong dan terisi
+        // TAMBAHAN: Cek apakah blok sudah digunakan
+        boolean isUsed = blockUsed[i];
+        boolean isEmpty = (type == -1);
+        
+        // Draw slot background - berbeda untuk slot kosong, terpakai, dan tersedia
         Color slotBg;
-        if (type == -1) {
+        if (isUsed) {
+            // Blok sudah digunakan - warna abu-abu sangat gelap
+            slotBg = (Color){ 40, 40, 40, 200 };
+        } else if (isEmpty) {
             // Slot kosong - warna abu-abu gelap
             slotBg = (Color){ 60, 60, 60, 200 };
         } else if (i == selectedIndex) {
@@ -154,7 +161,15 @@ void DrawNextBlocks(int selectedIndex){
         );
         
         // Draw slot border
-        Color borderColor = (i == selectedIndex) ? (Color){255, 255, 255, 255} : (Color){120, 120, 120, 255};
+        Color borderColor;
+        if (isUsed) {
+            borderColor = (Color){60, 60, 60, 255}; // Border gelap untuk blok terpakai
+        } else if (i == selectedIndex) {
+            borderColor = (Color){255, 255, 255, 255}; // Border putih untuk terpilih
+        } else {
+            borderColor = (Color){120, 120, 120, 255}; // Border default
+        }
+        
         DrawRectangleRoundedLines(
             (Rectangle){blockX - 5, blockY - 5, 70, 70},
             0.15f,
@@ -162,8 +177,11 @@ void DrawNextBlocks(int selectedIndex){
             borderColor
         );
         
-        if (type != -1) {
-            // Draw block preview dengan ukuran lebih besar
+        if (isUsed) {
+            // Blok sudah digunakan - tampilkan "USED" dengan warna redup
+            DrawText("USED", blockX + 18, blockY + 20, 12, (Color){100, 100, 100, 255});
+        } else if (type != -1) {
+            // Draw block preview dengan ukuran lebih besar (hanya jika belum digunakan)
             float blockScale = 0.8f; // Meningkatkan skala blok preview
             for (int j = 0; j < MAX_BLOCK_SIZE; j++) {
                 int bx = blockX + 30 + (int)(blockShapes[type][j].x * TILE_SIZES * blockScale);
@@ -195,7 +213,14 @@ void DrawNextBlocks(int selectedIndex){
         }
         
         // Draw selection number di bawah blok
-        Color numberColor = (type == -1) ? (Color){100, 100, 100, 255} : UI_TEXT;
+        Color numberColor;
+        if (isUsed) {
+            numberColor = (Color){80, 80, 80, 255}; // Nomor redup untuk blok terpakai
+        } else if (type == -1) {
+            numberColor = (Color){100, 100, 100, 255}; // Nomor abu untuk slot kosong
+        } else {
+            numberColor = UI_TEXT; // Nomor normal untuk blok tersedia
+        }
         DrawText(TextFormat("%d", i+1), blockX + 25, blockY + 55, 22, numberColor);
     }
 }
