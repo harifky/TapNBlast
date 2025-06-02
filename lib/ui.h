@@ -13,6 +13,9 @@ void DrawGrids();
 
 //Score
 void DrawScorePanel();
+// GameOver
+
+void DrawGameOverPanel();
 
 void drawButton(Texture2D texture, Sound sfx);
 
