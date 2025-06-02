@@ -4,6 +4,8 @@ void StartGame() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
     SetTargetFPS(60);
 
+    drawMenu();
+
     srand(time(NULL));
     int currentBlock = rand() % BLOCK_TYPES;
     int blockSize = MAX_BLOCK_SIZE;

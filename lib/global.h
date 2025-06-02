@@ -93,6 +93,11 @@ Color blockColors[BLOCK_TYPES] = {
     (Color){ 255, 220, 60, 255 },     // Yellow
 };
 
+typedef enum {
+    GAME_STATE_MENU,
+    GAME_STATE_PLAYING,
+    GAME_STATE_PAUSED
+} GameState
 
 int gridOriginX = 25;
 int gridOriginY = 110;
