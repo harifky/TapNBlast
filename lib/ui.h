@@ -15,4 +15,9 @@ void DrawScorePanel();
 
 void DrawGameOverPanel();
 
+// draw block preview
+void DrawNextBlocks(int selectedIndex, int currentBatch[3]);
+
+
+
 #endif /* UI_H */
