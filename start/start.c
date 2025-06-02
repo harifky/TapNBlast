@@ -8,45 +8,43 @@ void StartGame() {
     int blockSize = MAX_BLOCK_SIZE;
     boolean GameOver = true;
     int selectedIndex = 0;
+    int blocksUsedInBatch = 0; // Counter untuk melacak berapa blok yang sudah digunakan dalam batch
     
-    // Array untuk menyimpan 3 blok dalam batch
-    int currentBatch[3];
-    
-    // Inisialisasi batch pertama
+    // Inisialisasi queue dengan batch pertama (3 blok)
     for (int i = 0; i < 3; i++) {
-        currentBatch[i] = GetRandomValue(1, 40);
+        Enqueue(GetRandomValue(1, 40));
     }
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(PURPLE);
         
-        // Ambil blok yang dipilih dari batch
-        int currentBlock = currentBatch[selectedIndex];
+        // Ambil blok yang dipilih dari queue
+        int currentBlock = GetQueueAt(selectedIndex);
 
         DrawGrids();
 
         // Posisi mouse terhadap grid
-        Vector2 mouse = GetMousePosition();
-        int mx = (int)((mouse.x - gridOriginX) / TILE_SIZE);
-        int my = (int)((mouse.y - gridOriginY) / TILE_SIZE);
+        // Vector2 mouse = GetMousePosition();
+        // int mx = (int)((mouse.x - gridOriginX) / TILE_SIZE);
+        // int my = (int)((mouse.y - gridOriginY) / TILE_SIZE);
 
-        // Gambar preview block transparan di posisi mouse (hanya jika ada blok yang valid)
-        if (currentBlock != -1) {
-            for (int i = 0; i < blockSize; i++) {
-                int x = mx + blockShapes[currentBlock][i].x;
-                int y = my + blockShapes[currentBlock][i].y;
-                if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
-                    DrawRectangle(
-                        gridOriginX + x * TILE_SIZE,
-                        gridOriginY + y * TILE_SIZE,
-                        BLOCK_SIZE,
-                        BLOCK_SIZE,
-                        Fade(blockColors[currentBlock], 0.5f)
-                    );
-                }
-            }
-        }
+        // // Gambar preview block transparan di posisi mouse (hanya jika ada blok yang valid)
+        // if (currentBlock != -1) {
+        //     for (int i = 0; i < blockSize; i++) {
+        //         int x = mx + blockShapes[currentBlock][i].x;
+        //         int y = my + blockShapes[currentBlock][i].y;
+        //         if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
+        //             DrawRectangle(
+        //                 gridOriginX + x * TILE_SIZE,
+        //                 gridOriginY + y * TILE_SIZE,
+        //                 BLOCK_SIZE,
+        //                 BLOCK_SIZE,
+        //                 Fade(blockColors[currentBlock], 0.5f)
+        //             );
+        //         }
+        //     }
+        // }
 
         // Cek klik mouse untuk menempatkan blok
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -60,33 +58,28 @@ void StartGame() {
                 if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
                     PlaceBlock(gx, gy, currentBlock);
                     
-                    // Kosongkan slot yang digunakan (set ke -1)
-                    currentBatch[selectedIndex] = -1;
+                    // Set slot yang digunakan menjadi kosong (-1) tanpa menghapus dari queue
+                    Dequeue();
+                    blocksUsedInBatch++;
                     
-                    // Cek apakah semua slot sudah kosong
-                    boolean allSlotsEmpty = true;
-                    for (int i = 0; i < 3; i++) {
-                        if (currentBatch[i] != -1) {
-                            allSlotsEmpty = false;
-                            break;
-                        }
-                    }
-                    
-                    // Jika semua slot kosong, generate batch baru
-                    if (allSlotsEmpty) {
+                    // Jika semua 3 blok dalam batch sudah digunakan, generate batch baru
+                    if (blocksUsedInBatch >= 3) {
+                        // Enqueue batch baru
                         for (int i = 0; i < 3; i++) {
-                            currentBatch[i] = GetRandomValue(1, 40);
+                            Enqueue(GetRandomValue(1, 40));
                         }
+                        
+                        blocksUsedInBatch = 0; // Reset counter
                         selectedIndex = 0; // Reset ke slot pertama
                     } else {
                         // Pindah ke slot berikutnya yang tidak kosong
                         int nextIndex = selectedIndex;
                         do {
                             nextIndex = (nextIndex + 1) % 3;
-                        } while (currentBatch[nextIndex] == -1 && nextIndex != selectedIndex);
+                        } while (GetQueueAt(nextIndex) == -1 && nextIndex != selectedIndex);
                         
                         // Jika ada slot yang tidak kosong, pindah ke sana
-                        if (currentBatch[nextIndex] != -1) {
+                        if (GetQueueAt(nextIndex) != -1) {
                             selectedIndex = nextIndex;
                         }
                     }
@@ -96,7 +89,8 @@ void StartGame() {
                     // Cek game over - apakah masih ada blok yang bisa ditempatkan
                     boolean hasValidMove = false;
                     for (int i = 0; i < 3; i++) {
-                        if (currentBatch[i] != -1 && HasValidPlacement(currentBatch[i])) {
+                        int blockType = GetQueueAt(i);
+                        if (blockType != -1 && HasValidPlacement(blockType)) {
                             hasValidMove = true;
                             break;
                         }
@@ -110,9 +104,9 @@ void StartGame() {
         }
 
         // Input untuk memilih blok (hanya jika slot tidak kosong)
-        if (IsKeyPressed(KEY_ONE) && currentBatch[0] != -1) selectedIndex = 0;
-        if (IsKeyPressed(KEY_TWO) && currentBatch[1] != -1) selectedIndex = 1;
-        if (IsKeyPressed(KEY_THREE) && currentBatch[2] != -1) selectedIndex = 2;
+        if (IsKeyPressed(KEY_ONE) && GetQueueAt(0) != -1) selectedIndex = 0;
+        if (IsKeyPressed(KEY_TWO) && GetQueueAt(1) != -1) selectedIndex = 1;
+        if (IsKeyPressed(KEY_THREE) && GetQueueAt(2) != -1) selectedIndex = 2;
         
         // Panel game over
         if (!GameOver) {
@@ -132,11 +126,22 @@ void StartGame() {
             score = 0;
             GameOver = true;
             selectedIndex = 0;
+            blocksUsedInBatch = 0;
             
-            // Generate batch baru
+           
+            Dequeue();
+            
             for (int i = 0; i < 3; i++) {
-                currentBatch[i] = GetRandomValue(1, 40);
+                Enqueue(GetRandomValue(1, 40));
             }
+        }
+
+        // Draw block shadow
+        Vector2 mousePos = GetMousePosition();
+        int blockType = GetQueueAt(selectedIndex);
+        
+        if (blockType != -1) {
+            DrawBlockShadow((int)mousePos.x, (int)mousePos.y, blockType);
         }
 
         // Gambar informasi FPS dan debug info
@@ -144,14 +149,15 @@ void StartGame() {
         
         // Debug info untuk melihat status batch
         char batchInfo[100];
-        sprintf(batchInfo, "Batch: [%s] [%s] [%s]", 
-                currentBatch[0] == -1 ? "Empty" : "Block",
-                currentBatch[1] == -1 ? "Empty" : "Block", 
-                currentBatch[2] == -1 ? "Empty" : "Block");
+        sprintf(batchInfo, "Batch: [%s] [%s] [%s] - Used: %d/3", 
+                GetQueueAt(0) == -1 ? "Empty" : "Block",
+                GetQueueAt(1) == -1 ? "Empty" : "Block", 
+                GetQueueAt(2) == -1 ? "Empty" : "Block",
+                blocksUsedInBatch);
         DrawText(batchInfo, 10, SCREEN_HEIGHT - 45, 14, BLACK);
         
         DrawScorePanel();
-        DrawNextBlocks(selectedIndex, currentBatch);
+        DrawNextBlocks(selectedIndex);
 
         EndDrawing();
     }
