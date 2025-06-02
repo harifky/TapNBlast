@@ -99,7 +99,7 @@ void DrawGameOverPanel() {
     DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
 }
 
-void DrawNextBlocks(int selectedIndex, int currentBatch[3]) {
+void DrawNextBlocks(int selectedIndex){
     // Posisi baru - di bawah grid dan di tengah
     int panelWidth = 370;  // Panel lebih lebar untuk jarak lebih banyak
     int panelHeight = 110; // Panel lebih tinggi untuk blok lebih besar
@@ -129,7 +129,7 @@ void DrawNextBlocks(int selectedIndex, int currentBatch[3]) {
     int startX = panelX + (panelWidth - 3 * blockSpacing) / 2;
     
     for (int i = 0; i < 3; i++) {
-        int type = currentBatch[i]; // Menggunakan currentBatch instead of GetQueueAt(i)
+        int type = GetQueueAt(i); // Menggunakan currentBatch instead of GetQueueAt(i)
         int blockX = startX + i * blockSpacing;
         int blockY = panelY + 35;
         
@@ -173,7 +173,7 @@ void DrawNextBlocks(int selectedIndex, int currentBatch[3]) {
                     (Rectangle){bx - TILE_SIZES*blockScale/2, by - TILE_SIZES*blockScale/2, TILE_SIZES*blockScale, TILE_SIZES*blockScale},
                     0.3f,
                     1,
-                    blockColors[type]
+                    blockColors[type-1]
                 );
                 
                 // Tambahkan efek glossy pada blok
@@ -199,3 +199,48 @@ void DrawNextBlocks(int selectedIndex, int currentBatch[3]) {
         DrawText(TextFormat("%d", i+1), blockX + 25, blockY + 55, 22, numberColor);
     }
 }
+
+void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
+    if (blockType < 1 || blockType > 40) return;
+    
+    // Hitung posisi grid dari posisi kursor
+    int gridX = (int)((cursorX - gridOriginX) / TILE_SIZE);
+    int gridY = (int)((cursorY - gridOriginY) / TILE_SIZE);
+    
+    
+    // Gambar bayangan untuk setiap bagian blok
+    for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
+        int bx = gridX + (int)blockShapes[blockType][i].x;
+        int by = gridY + (int)blockShapes[blockType][i].y;
+        
+       
+        if (bx < 0 || bx >= GRID_SIZE || by < 0 || by >= GRID_SIZE) continue;
+        
+        int screenX = gridOriginX + bx * TILE_SIZE;
+        int screenY = gridOriginY + by * TILE_SIZE;
+        
+        // Gambar bayangan blok dengan warna yang lebih kontras
+        Color shadowColor = blockColors[blockType-1];
+        shadowColor.a = 180;  // Lebih pekat (0-255)
+        
+        // Gambar bayangan blok
+        DrawRectangle(
+            screenX + 1,  // Offset sedikit untuk efek bayangan
+            screenY + 1,
+            TILE_SIZE - 4, TILE_SIZE - 4,
+            shadowColor
+        );
+        // Gambar garis tepi dengan warna yang lebih tebal dan kontras
+        DrawRectangleLines(
+            screenX,
+            screenY,
+            TILE_SIZE - 2, TILE_SIZE - 2,
+            BLACK
+        );
+        
+        // Tambahkan highlight di sudut untuk visualisasi lebih baik
+        DrawRectangle(screenX + 5, screenY + 5, 5, 5, WHITE);
+    }
+}
+
+
