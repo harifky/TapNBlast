@@ -17,6 +17,13 @@ void DrawScorePanel();
 
 void DrawGameOverPanel();
 
+// draw block preview
+void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
+
+void DrawBlockShadow(int cursorX, int cursorY, int blockType);
+
+
+
 void drawButton(Texture2D texture, Sound sfx);
 
 void drawMenu();
