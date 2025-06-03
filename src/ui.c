@@ -232,21 +232,33 @@ void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
     int gridX = (int)((cursorX - gridOriginX) / TILE_SIZE);
     int gridY = (int)((cursorY - gridOriginY) / TILE_SIZE);
     
+    // Cek apakah blok dapat ditempatkan di posisi ini
+    boolean canPlace = CanPlaceBlock(gridX, gridY, blockType);
     
     // Gambar bayangan untuk setiap bagian blok
     for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
         int bx = gridX + (int)blockShapes[blockType][i].x;
         int by = gridY + (int)blockShapes[blockType][i].y;
         
-       
+        // Skip jika di luar grid
         if (bx < 0 || bx >= GRID_SIZE || by < 0 || by >= GRID_SIZE) continue;
         
         int screenX = gridOriginX + bx * TILE_SIZE;
         int screenY = gridOriginY + by * TILE_SIZE;
         
-        // Gambar bayangan blok dengan warna yang lebih kontras
-        Color shadowColor = blockColors[blockType-1];
-        shadowColor.a = 180;  // Lebih pekat (0-255)
+        Color shadowColor;
+        Color borderColor;
+        
+        if (canPlace) {
+            // Blok dapat ditempatkan - gunakan warna normal dengan transparansi
+            shadowColor = blockColors[blockType-1];
+            shadowColor.a = 180;  // Transparansi untuk shadow
+            borderColor = BLACK;
+        } else {
+            // Blok tidak dapat ditempatkan - gunakan warna merah
+            shadowColor = (Color){255, 50, 50, 180};  // Merah dengan transparansi
+            borderColor = (Color){200, 0, 0, 255};    // Merah gelap untuk border
+        }
         
         // Gambar bayangan blok
         DrawRectangle(
@@ -255,17 +267,22 @@ void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
             TILE_SIZE - 4, TILE_SIZE - 4,
             shadowColor
         );
-        // Gambar garis tepi dengan warna yang lebih tebal dan kontras
+        
+        // Gambar garis tepi dengan warna yang sesuai
         DrawRectangleLines(
             screenX,
             screenY,
             TILE_SIZE - 2, TILE_SIZE - 2,
-            BLACK
+            borderColor
         );
         
-        // Tambahkan highlight di sudut untuk visualisasi lebih baik
-        DrawRectangle(screenX + 5, screenY + 5, 5, 5, WHITE);
+        if (canPlace) {
+            // Tambahkan highlight di sudut untuk visualisasi lebih baik (hanya jika bisa ditempatkan)
+            DrawRectangle(screenX + 5, screenY + 5, 5, 5, WHITE);
+        } else {
+            // Tambahkan tanda X untuk indikator tidak bisa ditempatkan
+            DrawLine(screenX + 5, screenY + 5, screenX + TILE_SIZE - 7, screenY + TILE_SIZE - 7, (Color){255, 255, 255, 200});
+            DrawLine(screenX + TILE_SIZE - 7, screenY + 5, screenX + 5, screenY + TILE_SIZE - 7, (Color){255, 255, 255, 200});
+        }
     }
 }
-
-
