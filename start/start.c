@@ -6,47 +6,30 @@ int GetValidRandomBlockType() {
 }
 
 void GenerateNewBatch(boolean* blockUsed) {
-    ClearQueue();
+    // Jangan clear queue dulu, siapkan data baru terlebih dahulu
+    int newBlocks[3];
     
+    // Generate semua blok dulu
     for (int i = 0; i < 3; i++) {
         int blockType;
         int attempts = 0;
-        
-        // Loop hingga mendapat blok yang valid
         do {
             blockType = GetValidRandomBlockType();
             attempts++;
-            
-            // Jika sudah 50 percobaan, gunakan blok sequential untuk memastikan validitas
-            if (attempts >= 50) {
-                blockType = (i % 40) + 1; // Gunakan blok 1-40 secara berurutan
-                break;
-            }
-        } while (blockType < 1 || blockType > 40);
+        } while ((blockType < 1 || blockType > 40) && attempts < 10);
         
-        // Double check - pastikan blockType valid
         if (blockType < 1 || blockType > 40) {
-            blockType = (i % 40) + 1; // Fallback ke blok sequential
+            blockType = (i % 40) + 1;
         }
         
-        Enqueue(blockType);
+        newBlocks[i] = blockType;
         blockUsed[i] = false;
     }
     
-    // Verifikasi bahwa queue berisi 3 blok yang valid
+    // Baru setelah semua siap, replace queue sekaligus
+    ClearQueue();
     for (int i = 0; i < 3; i++) {
-        int queueBlock = GetQueueAt(i);
-        if (queueBlock == -1 || queueBlock < 1 || queueBlock > 40) {
-            // Jika ada blok yang tidak valid, ganti dengan blok default
-            // Asumsi ada fungsi untuk mengatur elemen queue secara langsung
-            // Atau bisa menggunakan ClearQueue dan rebuild seluruhnya
-            ClearQueue();
-            for (int j = 0; j < 3; j++) {
-                Enqueue((j % 40) + 1); // Gunakan blok 1, 2, 3 sebagai fallback
-                blockUsed[j] = false;
-            }
-            break;
-        }
+        Enqueue(newBlocks[i]);
     }
 }
 
