@@ -33,6 +33,10 @@ void StartGame() {
     SetTargetFPS(60);
     srand(time(NULL));
 
+    Sound clickSound = LoadSound("assets/buttonfx.wav");
+
+    InitAudioDevice();
+
     InitMainMenu();
 
     // Tampilkan menu utama sampai user klik tombol Play atau Exit
@@ -40,7 +44,7 @@ void StartGame() {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        int menuResult = UpdateMainMenu();  // Ini akan menggambar dan cek klik tombol
+        int menuResult = UpdateMainMenu(clickSound);  // Ini akan menggambar dan cek klik tombol
 
         EndDrawing();
 
@@ -171,6 +175,9 @@ void StartGame() {
 
         EndDrawing();
     }
+
+    UnloadSound(clickSound);
+    CloseAudioDevice();
 
     CloseWindow();
 }

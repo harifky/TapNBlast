@@ -44,6 +44,7 @@ typedef struct {
     bool isHovered;
     bool isPressed;
     float animScale;
+    Sound clickSound;
 } MenuButton;
 
 // Menu variables
@@ -60,12 +61,12 @@ static MenuButton exitButton;
 static MenuButton backButton;
 
 void InitMainMenu();
-void UpdateMenuButton(MenuButton* button);
+void UpdateMenuButton(MenuButton* button, Sound clickSound);
 void DrawMenuBackground();
 void DrawGameTitle();
-void DrawMainMenu();
-void DrawSettingsMenu();
-void DrawAboutMenu();
-int UpdateMainMenu();
+void DrawMainMenu(Sound clickSound);
+void DrawSettingsMenu(Sound clickSound);
+void DrawAboutMenu(Sound clickSound);
+int UpdateMainMenu(Sound clickSound);
 
 #endif /* UI_H */
