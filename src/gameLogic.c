@@ -80,6 +80,8 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType){
 }
 
 void ClearFullLines(){
+
+    Sound Scoresound = LoadSound("assets/scorecoint.wav");
    
     for (int y = 0; y < GRID_SIZE; y++) {
         boolean full = true;
@@ -92,6 +94,7 @@ void ClearFullLines(){
         if (full) {
             for (int x = 0; x < GRID_SIZE; x++) grid[y][x] = 0;
             score = score + 100;
+            PlaySound(Scoresound);
         }
     }
     
@@ -106,6 +109,7 @@ void ClearFullLines(){
         if (full) {
             for (int y = 0; y < GRID_SIZE; y++) grid[y][x] = 0;
             score = score + 100;
+            PlaySound(Scoresound);
         }
     }
 }
