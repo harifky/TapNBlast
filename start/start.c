@@ -55,7 +55,26 @@ void StartGame() {
     SetTargetFPS(60);
     srand(time(NULL));
 
-    int blockSize = MAX_BLOCK_SIZE;
+    InitMainMenu();
+
+    // Tampilkan menu utama sampai user klik tombol Play atau Exit
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        int menuResult = UpdateMainMenu();  // Ini akan menggambar dan cek klik tombol
+
+        EndDrawing();
+
+        if (menuResult == 1) break;     // User menekan Play
+        if (menuResult == -1) {
+            CloseWindow();              // User menekan Exit
+            return;
+        }
+    }
+
+
+    // int blockSize = MAX_BLOCK_SIZE;
     boolean GameOver = true;
     int selectedIndex = 0;
     int blocksUsedInBatch = 0;

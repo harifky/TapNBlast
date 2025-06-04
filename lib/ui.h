@@ -6,6 +6,8 @@
 #include "animation.h"
 #include "raylib.h"
 
+
+
 // UI functions
 void DrawGrids();
 
@@ -21,5 +23,49 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
 void DrawBlockShadow(int cursorX, int cursorY, int blockType);
 
 
+
+void drawButton(Texture2D texture, Sound sfx);
+
+void drawMenu();
+
+// Menu state
+typedef enum {
+    MENU_MAIN,
+    MENU_SETTINGS,
+    MENU_ABOUT
+} MenuState;
+
+typedef struct {
+    Rectangle rect;
+    char text[32];
+    Color color;
+    Color hoverColor;
+    Color textColor;
+    bool isHovered;
+    bool isPressed;
+    float animScale;
+} MenuButton;
+
+// Menu variables
+static MenuState currentMenuState = MENU_MAIN;
+static float menuAnimTime = 0.0f;
+static float titleBounce = 0.0f;
+static float backgroundOffset = 0.0f;
+
+// Buttons
+static MenuButton playButton;
+static MenuButton settingsButton;
+static MenuButton aboutButton;
+static MenuButton exitButton;
+static MenuButton backButton;
+
+void InitMainMenu();
+void UpdateMenuButton(MenuButton* button);
+void DrawMenuBackground();
+void DrawGameTitle();
+void DrawMainMenu();
+void DrawSettingsMenu();
+void DrawAboutMenu();
+int UpdateMainMenu();
 
 #endif /* UI_H */

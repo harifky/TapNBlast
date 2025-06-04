@@ -93,7 +93,12 @@ Color blockColors[BLOCK_TYPES] = {
     (Color){ 0, 255, 255, 255 },     // Electric Cyan
 };
 
-// Posisi grid
+typedef enum {
+    GAME_STATE_MENU,
+    GAME_STATE_PLAYING,
+    GAME_STATE_PAUSED
+} GameState;
+
 int gridOriginX = 25;
 int gridOriginY = 110;
 
