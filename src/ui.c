@@ -115,9 +115,9 @@ void InitMainMenu() {
         .color = (Color){60, 179, 113, 255},      // Medium Sea Green
         .hoverColor = (Color){90, 195, 140, 255},
         .textColor = WHITE,
-        .animScale = 1.0f
+        .animScale = 1.0f,
+        .text = "SETTING"
     };
-    strcpy(settingsButton.text, "SETTINGS");
     
     // Initialize About Button
     aboutButton = (MenuButton){
@@ -125,9 +125,9 @@ void InitMainMenu() {
         .color = (Color){255, 165, 0, 255},       // Orange
         .hoverColor = (Color){255, 185, 50, 255},
         .textColor = WHITE,
-        .animScale = 1.0f
+        .animScale = 1.0f,
+        .text = "ABOUT"
     };
-    strcpy(aboutButton.text, "ABOUT");
     
     // Initialize Exit Button
     exitButton = (MenuButton){
@@ -135,9 +135,9 @@ void InitMainMenu() {
         .color = (Color){220, 20, 60, 255},       // Crimson
         .hoverColor = (Color){255, 69, 100, 255},
         .textColor = WHITE,
-        .animScale = 1.0f
+        .animScale = 1.0f,
+        .text = "EXIT"
     };
-    strcpy(exitButton.text, "EXIT");
     
     // Initialize Back Button
     backButton = (MenuButton){
@@ -145,9 +145,10 @@ void InitMainMenu() {
         .color = (Color){128, 128, 128, 255},     // Gray
         .hoverColor = (Color){160, 160, 160, 255},
         .textColor = WHITE,
-        .animScale = 1.0f
+        .animScale = 1.0f,
+        .text = "BACK"
     };
-    strcpy(backButton.text, "BACK");
+
 }
 
 // Update button animation and interaction
@@ -160,9 +161,7 @@ void UpdateMenuButton(MenuButton* button, Sound clickSound) {
     button->isPressed = button->isHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
     
     if (button->isPressed && !wasPressed) {
-        TraceLog(LOG_INFO, "Button '%s' pressed!", button->text);
         PlaySound(clickSound);
-        TraceLog(LOG_INFO, "Button '%s' sounded!", button->text);
     }
     
     // Smooth animation
