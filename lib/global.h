@@ -16,7 +16,7 @@
 #define MAX_UNDO 3
 #define MAX_ANIM 20
 #define cell
-#define BLOCK_TYPES 40 
+#define BLOCK_TYPES 36
 #define TILE_SIZES 25
 
 #define UI_PANEL_HEIGHT 90

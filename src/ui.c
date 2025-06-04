@@ -498,7 +498,7 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
 }
 
 void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
-    if (blockType < 1 || blockType > 40) return;
+    if (blockType < 1 || blockType > 36) return;
     
     // Hitung posisi grid dari posisi kursor
     int gridX = (int)((cursorX - gridOriginX) / TILE_SIZE);
