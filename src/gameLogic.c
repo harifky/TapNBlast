@@ -56,7 +56,7 @@ void PlaceBlock(int centerX, int centerY, int blockType){
 }
 
 boolean HasValidPlacement(int blockType){
-    if (blockType < 1 || blockType > 40) return false;
+    if (blockType < 1 || blockType > 36) return false;
 
     for (int y = 0; y < GRID_SIZE; y++) {
         for (int x = 0; x < GRID_SIZE; x++) {
@@ -67,7 +67,7 @@ boolean HasValidPlacement(int blockType){
 }
 
 boolean CanPlaceBlock(int centerX, int centerY, int blockType){
-    if (blockType < 1 || blockType > 40) return false;
+    if (blockType < 1 || blockType > 36) return false;
 
     for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
         int bx = centerX + (int)blockShapes[blockType][i].x;
@@ -80,6 +80,8 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType){
 }
 
 void ClearFullLines(){
+
+    Sound Scoresound = LoadSound("assets/scorecoint.wav");
    
     for (int y = 0; y < GRID_SIZE; y++) {
         boolean full = true;
@@ -92,6 +94,7 @@ void ClearFullLines(){
         if (full) {
             for (int x = 0; x < GRID_SIZE; x++) grid[y][x] = 0;
             score = score + 100;
+            PlaySound(Scoresound);
         }
     }
     
@@ -106,6 +109,7 @@ void ClearFullLines(){
         if (full) {
             for (int y = 0; y < GRID_SIZE; y++) grid[y][x] = 0;
             score = score + 100;
+            PlaySound(Scoresound);
         }
     }
 }

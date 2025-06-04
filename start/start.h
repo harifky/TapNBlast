@@ -17,5 +17,7 @@
 #include "raylib.h"
 
 void StartGame();
+void GenerateNewBatch(boolean* blockUsed);
+int GetValidRandomBlockType();
 
 #endif
