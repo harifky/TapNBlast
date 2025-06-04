@@ -1,5 +1,6 @@
 #include "../lib/ui.h"
 #include "../lib/animation.h"
+#include "../lib/leaderboard.h"
 #include "../lib/global.h"
 
 void DrawGrids() {
@@ -366,10 +367,75 @@ int UpdateMainMenu(Sound clickSound) {
     
     return 0; // Stay in menu
 }
-void DrawGameOverPanel() {
-    DrawText("GAME OVER!", SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT/2 - 40, 28, (Color){200, 50, 50, 255});
-    DrawText(TextFormat("Final Score: %d", score), SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT/2, 20, UI_TEXT);
-    DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
+// void DrawGameOverPanel() {
+//     DrawText("GAME OVER!", SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT/2 - 40, 28, (Color){200, 50, 50, 255});
+//     DrawText(TextFormat("Final Score: %d", score), SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT/2, 20, UI_TEXT);
+//     DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
+// }
+
+void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration) {
+    // Background overlay
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){0, 0, 0, 180});
+    
+    // Main panel
+    int panelWidth = 400;
+    int panelHeight = 300;
+    int panelX = (SCREEN_WIDTH - panelWidth) / 2;
+    int panelY = (SCREEN_HEIGHT - panelHeight) / 2;
+    
+    DrawRectangleRounded(
+        (Rectangle){panelX, panelY, panelWidth, panelHeight},
+        0.15f, 10, (Color){40, 40, 60, 255}
+    );
+    
+    DrawRectangleRoundedLines(
+        (Rectangle){panelX, panelY, panelWidth, panelHeight},
+        0.15f, 10, (Color){200, 200, 200, 255}
+    );
+    
+    // Game Over title
+    DrawText("GAME OVER!", panelX + (panelWidth/2) - 80, panelY + 30, 28, (Color){255, 100, 100, 255});
+    
+    // Score and duration - FIXED: Use the passed duration parameter (which is now final)
+    char timeStr[16];
+    FormatDuration(duration, timeStr, sizeof(timeStr));
+    
+    DrawText(TextFormat("Final Score: %d", score), panelX + 30, panelY + 80, 20, WHITE);
+    DrawText(TextFormat("Time Played: %s", timeStr), panelX + 30, panelY + 110, 20, WHITE);
+    
+    // Check if this is a high score
+    int rank = GetLeaderboardRank(score);
+    if (rank <= 10) {
+        DrawText(TextFormat("New High Score! Rank #%d", rank), panelX + 30, panelY + 140, 18, (Color){255, 215, 0, 255});
+    }
+    
+    // Username input
+    DrawText("Enter your name:", panelX + 30, panelY + 170, 18, WHITE);
+    
+    // Input box
+    Rectangle inputBox = {panelX + 30, panelY + 195, panelWidth - 60, 30};
+    DrawRectangleRounded(inputBox, 0.1f, 5, (Color){20, 20, 30, 255});
+    DrawRectangleRoundedLines(inputBox, 0.1f, 5, WHITE);
+    
+    // Input text
+    DrawText(usernameInput->inputText, inputBox.x + 5, inputBox.y + 5, 20, WHITE);
+    
+    // Cursor blink
+    if (usernameInput->isActive && ((GetTime() * 2) - (int)(GetTime() * 2)) > 0.5f) {
+        int textWidth = MeasureText(usernameInput->inputText, 20);
+        DrawText("_", inputBox.x + 5 + textWidth, inputBox.y + 5, 20, WHITE);
+    }
+    
+    // Instructions
+    if (usernameInput->isActive) {
+        DrawText("Press ENTER to confirm", panelX + 30, panelY + 240, 14, (Color){200, 200, 200, 255});
+        DrawText("Press BACKSPACE to delete", panelX + 30, panelY + 260, 14, (Color){200, 200, 200, 255});
+        // ADDED: Show ESC option
+        DrawText("Press ESC to skip", panelX + 200, panelY + 240, 14, (Color){200, 200, 200, 255});
+    } else if (usernameInput->isComplete) {
+        // FIXED: Remove "Saving..." message since we return immediately
+        DrawText("Score saved!", panelX + 30, panelY + 240, 16, (Color){100, 255, 100, 255});
+    }
 }
 
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed){

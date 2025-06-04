@@ -128,10 +128,9 @@ void ClearFullLines(){
             case 1: baseScore = 100; break;
             case 2: baseScore = 250; break;
             case 3: baseScore = 400; break;
-            case 4: baseScore = 600; break;
             default: 
-                // Untuk lebih dari 4 lines, gunakan formula
-                baseScore = 600 + (clearedLines - 4) * 200;
+                // Untuk 4 atau lebih lines (lebih dari 3 sekaligus)
+                baseScore = 600;
                 break;
         }
         

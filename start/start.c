@@ -1,255 +1,315 @@
 #include "start.h"
 
+UsernameInput usernameInput;
+bool isInGameOverInput = false;
+bool leaderboardSaved = false;
+time_t gameStartTime;
+int gameDuration;
+int finalGameDuration = 0;
+bool shouldReturnToMenu = false;
+
 int GetValidRandomBlockType() {
-    // Pastikan selalu mengembalikan blok yang valid (1-40)
-    return GetRandomValue(1, 36);
+  // Pastikan selalu mengembalikan blok yang valid (1-40)
+  return GetRandomValue(1, 35);
 }
 
-void GenerateNewBatch(boolean* blockUsed) {
-    // Jangan clear queue dulu, siapkan data baru terlebih dahulu
-    int newBlocks[3];
-    
-    // Generate semua blok dulu
-    for (int i = 0; i < 3; i++) {
-        int blockType;
-        int attempts = 0;
-        do {
-            blockType = GetValidRandomBlockType();
-            attempts++;
-            
-            // Jika sudah 50 percobaan, gunakan blok sequential untuk memastikan validitas
-            if (attempts >= 50) {
-                blockType = (i % 36) + 1; // Gunakan blok 1-40 secara berurutan
-                break;
-            }
-        } while (blockType < 1 || blockType > 36);
-        
-        // Double check - pastikan blockType valid
-        if (blockType < 1 || blockType > 36) {
-            blockType = (i % 40) + 1; // Fallback ke blok sequential
-        }
-        
-        newBlocks[i] = blockType;
-        blockUsed[i] = false;
+void GenerateNewBatch(boolean *blockUsed) {
+  ClearQueue();
+
+  for (int i = 0; i < 3; i++) {
+    int blockType;
+    int attempts = 0;
+
+    // Loop hingga mendapat blok yang valid
+    do {
+      blockType = GetValidRandomBlockType();
+      attempts++;
+
+      // Jika sudah 50 percobaan, gunakan blok sequential untuk memastikan
+      // validitas
+      if (attempts >= 50) {
+        blockType = (i % 35) + 1; // Gunakan blok 1-40 secara berurutan
+        break;
+      }
+    } while (blockType < 1 || blockType > 35);
+
+    // Double check - pastikan blockType valid
+    if (blockType < 1 || blockType > 35) {
+      blockType = (i % 40) + 1; // Fallback ke blok sequential
     }
-    
-    // Baru setelah semua siap, replace queue sekaligus
-    ClearQueue();
-    for (int i = 0; i < 3; i++) {
-        int queueBlock = GetQueueAt(i);
-        if (queueBlock == -1 || queueBlock < 1 || queueBlock > 36) {
-            // Jika ada blok yang tidak valid, ganti dengan blok default
-            // Asumsi ada fungsi untuk mengatur elemen queue secara langsung
-            // Atau bisa menggunakan ClearQueue dan rebuild seluruhnya
-            ClearQueue();
-            for (int j = 0; j < 3; j++) {
-                Enqueue((j % 36) + 1); // Gunakan blok 1, 2, 3 sebagai fallback
-                blockUsed[j] = false;
-            }
-            break;
-        }
+
+    Enqueue(blockType);
+    blockUsed[i] = false;
+  }
+
+  // Verifikasi bahwa queue berisi 3 blok yang valid
+  for (int i = 0; i < 3; i++) {
+    int queueBlock = GetQueueAt(i);
+    if (queueBlock == -1 || queueBlock < 1 || queueBlock > 35) {
+      // Jika ada blok yang tidak valid, ganti dengan blok default
+      // Asumsi ada fungsi untuk mengatur elemen queue secara langsung
+      // Atau bisa menggunakan ClearQueue dan rebuild seluruhnya
+      ClearQueue();
+      for (int j = 0; j < 3; j++) {
+        Enqueue((j % 35) + 1); // Gunakan blok 1, 2, 3 sebagai fallback
+        blockUsed[j] = false;
+      }
+      break;
     }
+  }
 }
 
 // Fungsi tambahan untuk memvalidasi apakah masih ada gerakan yang valid
-boolean HasAnyValidMove(boolean* blockUsed) {
-    for (int i = 0; i < 3; i++) {
-        int blockType = GetQueueAt(i);
-        
-        // Cek apakah slot ini berisi blok valid dan belum digunakan
-        if (blockType >= 1 && blockType <= 36 && !blockUsed[i]) {
-            // Cek apakah blok ini bisa ditempatkan di mana saja di grid
-            if (HasValidPlacement(blockType)) {
-                return true;
-            }
-        }
+boolean HasAnyValidMove(boolean *blockUsed) {
+  for (int i = 0; i < 3; i++) {
+    int blockType = GetQueueAt(i);
+
+    // Cek apakah slot ini berisi blok valid dan belum digunakan
+    if (blockType >= 1 && blockType <= 35 && !blockUsed[i]) {
+      // Cek apakah blok ini bisa ditempatkan di mana saja di grid
+      if (HasValidPlacement(blockType)) {
+        return true;
+      }
     }
-    return false;
+  }
+  return false;
+}
+
+// TAMBAHAN: Fungsi untuk reset game dan kembali ke menu
+void ReturnToMainMenu() {
+  // Reset semua variabel game
+  isInGameOverInput = false;
+  leaderboardSaved = false;
+  shouldReturnToMenu = true; // Set flag instead of calling StartGame
 }
 
 // Modifikasi fungsi StartGame - bagian yang relevan
 void StartGame() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
-    SetTargetFPS(60);
-    srand(time(NULL));
-    InitAudioDevice();
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
+  SetTargetFPS(60);
+  srand(time(NULL));
+  InitAudioDevice();
 
-    Sound clickSound = LoadSound("assets/buttonfx.wav");
+  InitLeaderboard();
+  Sound clickSound = LoadSound("assets/buttonfx.wav");
+  SetSoundVolume(clickSound, 1.0f);
+  
+  // PERBAIKAN 3: Main game loop dengan proper menu handling
+  while (!WindowShouldClose()) {
     
-    SetSoundVolume(clickSound, 1.0f);
-    if (!IsAudioDeviceReady()) {
-    TraceLog(LOG_ERROR, "Audio device not ready!");
-}
-    
-    
+    // MENU PHASE
     InitMainMenu();
+    shouldReturnToMenu = false; // Reset flag
+    
+    // Show main menu
+    while (!WindowShouldClose() && !shouldReturnToMenu) {
+      BeginDrawing();
+      ClearBackground(BLACK);
+      int menuResult = UpdateMainMenu(clickSound);
+      EndDrawing();
 
-    // Tampilkan menu utama sampai user klik tombol Play atau Exit
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
-        int menuResult = UpdateMainMenu(clickSound);  // Ini akan menggambar dan cek klik tombol
-
-        EndDrawing();
-
-        if (menuResult == 1) break;     // User menekan Play
-        if (menuResult == -1) {
-            CloseWindow();              // User menekan Exit
-            return;
-        }
+      if (menuResult == 1) break; // Play button pressed
+      if (menuResult == -1) {
+        // Exit button pressed
+        UnloadSound(clickSound);
+        CloseAudioDevice();
+        CloseWindow();
+        return;
+      }
     }
+    
+    // If shouldReturnToMenu is true, continue to show menu again
+    if (shouldReturnToMenu) continue;
+    
+    // If window should close, exit
+    if (WindowShouldClose()) break;
 
-
-    // int blockSize = MAX_BLOCK_SIZE;
+    // GAME PHASE - Reset game variables
+    gameStartTime = time(NULL);
+    finalGameDuration = 0;
     boolean GameOver = true;
     int selectedIndex = 0;
     int blocksUsedInBatch = 0;
     boolean blockUsed[3] = {false, false, false};
+    isInGameOverInput = false;
+    leaderboardSaved = false;
     
-    // Inisialisasi queue dengan batch pertama yang dijamin valid
+    // Reset score if needed
+    score = 0;
+    
+    // Initialize game
     GenerateNewBatch(blockUsed);
     
     // Pastikan selectedIndex menunjuk ke blok yang valid
-    while (selectedIndex < 3 && (GetQueueAt(selectedIndex) == -1 || blockUsed[selectedIndex])) {
-        selectedIndex++;
+    while (selectedIndex < 3 &&
+           (GetQueueAt(selectedIndex) == -1 || blockUsed[selectedIndex])) {
+      selectedIndex++;
     }
-    if (selectedIndex >= 3) selectedIndex = 0; // Reset ke 0 jika tidak ditemukan
+    if (selectedIndex >= 3) selectedIndex = 0;
 
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(PURPLE);
-        
-        int currentBlock = GetQueueAt(selectedIndex);
+    // GAME LOOP
+    while (!WindowShouldClose() && !shouldReturnToMenu) {
+      BeginDrawing();
+      ClearBackground(PURPLE);
 
-        DrawGrids();
+      // PERBAIKAN 4: Handle game over input dengan proper flow
+      if (isInGameOverInput) {
+        UpdateUsernameInput(&usernameInput);
+        DrawGameOverPanel(&usernameInput, score, finalGameDuration);
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 m = GetMousePosition();
-            int gx = (int)((m.x - gridOriginX) / TILE_SIZE);
-            int gy = (int)((m.y - gridOriginY) / TILE_SIZE);
-            
-            // Validasi tambahan untuk memastikan currentBlock valid
-            if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT && 
-                currentBlock >= 1 && currentBlock <= 36 && !blockUsed[selectedIndex]) {
-                
-                if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
-                    PlaceBlock(gx, gy, currentBlock);
-                    
-                    blockUsed[selectedIndex] = true;
-                    blocksUsedInBatch++;
-                    
-                    if (blocksUsedInBatch >= 3) {
-                        // Semua blok dalam batch sudah digunakan - generate batch baru
-                        GenerateNewBatch(blockUsed);
-                        blocksUsedInBatch = 0;
-                        selectedIndex = 0;
-                    } else {
-                        // Cari slot berikutnya yang belum digunakan dan berisi blok valid
-                        int nextIndex = selectedIndex;
-                        int attempts = 0;
-                        do {
-                            nextIndex = (nextIndex + 1) % 3;
-                            attempts++;
-                        } while (attempts < 3 && (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 || GetQueueAt(nextIndex) > 36));
-                        
-                        // Jika ditemukan slot valid, gunakan itu
-                        if (attempts < 3 && !blockUsed[nextIndex] && GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 36) {
-                            selectedIndex = nextIndex;
-                        }
-                    }
-
-                    ClearFullLines();
-                    
-                    // Cek game over dengan validasi yang lebih ketat
-                    if (!HasAnyValidMove(blockUsed)) {
-                        GameOver = false;
-                    }
-                }
-            }
+        // Jika input selesai dan belum disimpan
+        if (usernameInput.isComplete && !leaderboardSaved) {
+          AddToLeaderboard(usernameInput.inputText, score, finalGameDuration); // Use finalGameDuration instead of gameDuration
+          leaderboardSaved = true;
+          
+          // PERBAIKAN 5: Set flag instead of immediate return
+          shouldReturnToMenu = true;
         }
 
-        // Input untuk memilih blok dengan validasi yang lebih ketat
-        if (IsKeyPressed(KEY_ONE)) {
-            int blockType = GetQueueAt(0);
-            if (!blockUsed[0] && blockType >= 1 && blockType <= 36) {
-                selectedIndex = 0;
-            }
+        // Allow skip input with ESC
+        if (IsKeyPressed(KEY_ESCAPE)) {
+          shouldReturnToMenu = true;
         }
-        if (IsKeyPressed(KEY_TWO)) {
-            int blockType = GetQueueAt(1);
-            if (!blockUsed[1] && blockType >= 1 && blockType <= 36) {
-                selectedIndex = 1;
-            }
-        }
-        if (IsKeyPressed(KEY_THREE)) {
-            int blockType = GetQueueAt(2);
-            if (!blockUsed[2] && blockType >= 1 && blockType <= 36) {
-                selectedIndex = 2;
-            }
-        }
-        
-        if (!GameOver) {
-            DrawGameOverPanel();
-        }
-        
-        if (!GameOver && IsKeyPressed(KEY_R)) {
-            // Reset grid
-            for (int y = 0; y < GRID_SIZE; y++) {
-                for (int x = 0; x < GRID_SIZE; x++) {
-                    grid[y][x] = 0;
-                }
-            }
-            
-            // Reset game state
-            score = 0;
-            GameOver = true;
-            selectedIndex = 0;
-            blocksUsedInBatch = 0;
-            Dequeue();
-            
-            // Generate batch baru yang valid
-            GenerateNewBatch(blockUsed);
-        }
-
-        // Draw block shadow dengan validasi yang lebih ketat
-        Vector2 mousePos = GetMousePosition();
-        int blockType = GetQueueAt(selectedIndex);
-        
-        if (blockType >= 1 && blockType <= 36 && !blockUsed[selectedIndex]) {
-            DrawBlockShadow((int)mousePos.x, (int)mousePos.y, blockType);
-        }
-
-        // Debug info yang lebih informatif
-        DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
-        
-        char batchInfo[200];
-        sprintf(batchInfo, "Batch: [%s:%d] [%s:%d] [%s:%d] - Used: %d/3 - Selected: %d", 
-                blockUsed[0] ? "Used" : "Ready", GetQueueAt(0),
-                blockUsed[1] ? "Used" : "Ready", GetQueueAt(1), 
-                blockUsed[2] ? "Used" : "Ready", GetQueueAt(2),
-                blocksUsedInBatch, selectedIndex + 1);
-        DrawText(batchInfo, 10, SCREEN_HEIGHT - 45, 12, BLACK);
-        
-        // Tampilkan peringatan jika ada slot kosong (untuk debugging)
-        boolean hasEmptySlot = false;
-        for (int i = 0; i < 3; i++) {
-            if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 36) {
-                hasEmptySlot = true;
-                break;
-            }
-        }
-        if (hasEmptySlot) {
-            DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
-        }
-        
-        DrawScorePanel();
-        DrawNextBlocks(selectedIndex, blockUsed);
 
         EndDrawing();
+        
+        // PERBAIKAN 6: Check flag after EndDrawing
+        if (shouldReturnToMenu) break;
+        
+        continue;
+      }
+
+      // Regular game logic here...
+      int currentBlock = GetQueueAt(selectedIndex);
+      DrawGrids();
+
+      if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 m = GetMousePosition();
+        int gx = (int)((m.x - gridOriginX) / TILE_SIZE);
+        int gy = (int)((m.y - gridOriginY) / TILE_SIZE);
+
+        if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT &&
+            currentBlock >= 1 && currentBlock <= 35 &&
+            !blockUsed[selectedIndex]) {
+
+          if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
+            PlaceBlock(gx, gy, currentBlock);
+            blockUsed[selectedIndex] = true;
+            blocksUsedInBatch++;
+
+            if (blocksUsedInBatch >= 3) {
+              GenerateNewBatch(blockUsed);
+              blocksUsedInBatch = 0;
+              selectedIndex = 0;
+            } else {
+              int nextIndex = selectedIndex;
+              int attempts = 0;
+              do {
+                nextIndex = (nextIndex + 1) % 3;
+                attempts++;
+              } while (attempts < 3 &&
+                       (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 ||
+                        GetQueueAt(nextIndex) > 35));
+
+              if (attempts < 3 && !blockUsed[nextIndex] &&
+                  GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 35) {
+                selectedIndex = nextIndex;
+              }
+            }
+
+            ClearFullLines();
+
+            if (!HasAnyValidMove(blockUsed)) {
+              GameOver = false;
+            }
+          }
+        }
+      }
+
+      // Key input for block selection
+      if (IsKeyPressed(KEY_ONE)) {
+        int blockType = GetQueueAt(0);
+        if (!blockUsed[0] && blockType >= 1 && blockType <= 35) {
+          selectedIndex = 0;
+        }
+      }
+      if (IsKeyPressed(KEY_TWO)) {
+        int blockType = GetQueueAt(1);
+        if (!blockUsed[1] && blockType >= 1 && blockType <= 35) {
+          selectedIndex = 1;
+        }
+      }
+      if (IsKeyPressed(KEY_THREE)) {
+        int blockType = GetQueueAt(2);
+        if (!blockUsed[2] && blockType >= 1 && blockType <= 35) {
+          selectedIndex = 2;
+        }
+      }
+
+      // PERBAIKAN 7: Proper game over transition
+      if (!GameOver && !isInGameOverInput) {
+        time_t currentTime = time(NULL);
+        finalGameDuration = (int)(currentTime - gameStartTime);
+        
+        TraceLog(LOG_INFO, "Game ended. Start: %ld, End: %ld, Duration: %d",
+                 gameStartTime, currentTime, finalGameDuration);
+
+        isInGameOverInput = true;
+        leaderboardSaved = false;
+        InitUsernameInput(&usernameInput);
+      }
+
+      // Reset game with R - return to menu
+      if (!GameOver && IsKeyPressed(KEY_R) && !isInGameOverInput) {
+        shouldReturnToMenu = true;
+      }
+
+      // Draw game elements
+      Vector2 mousePos = GetMousePosition();
+      int blockType = GetQueueAt(selectedIndex);
+
+      if (blockType >= 1 && blockType <= 35 && !blockUsed[selectedIndex]) {
+        DrawBlockShadow((int)mousePos.x, (int)mousePos.y, blockType);
+      }
+
+      // Debug info
+      DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
+
+      char batchInfo[200];
+      sprintf(batchInfo,
+              "Batch: [%s:%d] [%s:%d] [%s:%d] - Used: %d/3 - Selected: %d",
+              blockUsed[0] ? "Used" : "Ready", GetQueueAt(0),
+              blockUsed[1] ? "Used" : "Ready", GetQueueAt(1),
+              blockUsed[2] ? "Used" : "Ready", GetQueueAt(2), blocksUsedInBatch,
+              selectedIndex + 1);
+      DrawText(batchInfo, 10, SCREEN_HEIGHT - 45, 12, BLACK);
+
+      boolean hasEmptySlot = false;
+      for (int i = 0; i < 3; i++) {
+        if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 35) {
+          hasEmptySlot = true;
+          break;
+        }
+      }
+      if (hasEmptySlot) {
+        DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
+      }
+
+      DrawScorePanel();
+      DrawNextBlocks(selectedIndex, blockUsed);
+
+      EndDrawing();
+      
+      // Check if should return to menu
+      if (shouldReturnToMenu) break;
     }
+    
+    // If window should close, exit main loop
+    if (WindowShouldClose()) break;
+  }
 
-    UnloadSound(clickSound);
-    CloseAudioDevice();
-
-    CloseWindow();
+  // Cleanup
+  UnloadSound(clickSound);
+  CloseAudioDevice();
+  CloseWindow();
 }
