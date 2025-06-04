@@ -1,6 +1,6 @@
 #include "../lib/gameLogic.h"
 #include "../lib/global.h"
-#include "../lib/boolean.h"
+#include "../lib/tree.h"
 
 
 void Enqueue(int blockType) {
@@ -27,10 +27,10 @@ int Dequeue(){
 
 int GetQueue(){
     if (queueFront == NULL) {
-        //fprintf(stderr, "GetQueue: Queue is empty!\n");
-        return -1; // Or a defined error/empty indicator
+
+        return -1; 
     }
-    // QueueNode *current = queueFront; // Unnecessary intermediate variable
+
     return queueFront->blockType;
 }
 
@@ -155,3 +155,127 @@ int GetQueueSize() {
 void ClearQueue() {
     while (Dequeue() != -1);
 }
+
+int GetValidRandomBlockType() {
+
+    return GetRandomValue(1, 36);
+}
+
+void GenerateRandomBatch(boolean* blockUsed) {
+    ClearQueue();
+    
+    for (int i = 0; i < 3; i++) {
+        int blockType;
+        int attempts = 0;
+        
+        // Loop hingga mendapat blok yang valid
+        do {
+            blockType = GetValidRandomBlockType();
+            attempts++;
+            
+            // Jika sudah 50 percobaan, gunakan blok sequential untuk memastikan validitas
+            if (attempts >= 50) {
+                blockType = (i % 36) + 1; // Gunakan blok 1-40 secara berurutan
+                break;
+            }
+        } while (blockType < 1 || blockType > 36);
+        
+        // Double check - pastikan blockType valid
+        if (blockType < 1 || blockType > 36) {
+            blockType = (i % 40) + 1; // Fallback ke blok sequential
+        }
+        
+        Enqueue(blockType);
+        blockUsed[i] = false;
+    }
+    
+    // Verifikasi bahwa queue berisi 3 blok yang valid
+    for (int i = 0; i < 3; i++) {
+        int queueBlock = GetQueueAt(i);
+        if (queueBlock == -1 || queueBlock < 1 || queueBlock > 36) {
+            // Jika ada blok yang tidak valid, ganti dengan blok default
+            // Asumsi ada fungsi untuk mengatur elemen queue secara langsung
+            // Atau bisa menggunakan ClearQueue dan rebuild seluruhnya
+            ClearQueue();
+            for (int j = 0; j < 3; j++) {
+                Enqueue((j % 36) + 1); // Gunakan blok 1, 2, 3 sebagai fallback
+                blockUsed[j] = false;
+            }
+            break;
+        }
+    }
+}
+
+void InitializeRandomGrid() {
+    // Kosongkan grid terlebih dahulu
+    for (int y = 0; y < GRID_SIZE; y++) {
+        for (int x = 0; x < GRID_SIZE; x++) {
+            grid[y][x] = 0;
+        }
+    }
+    
+    // Tentukan jumlah block random (15-25% dari total grid)
+    int totalCells = GRID_SIZE * GRID_SIZE;
+    int randomBlockCount = GetRandomValue(totalCells * 20 / 50, totalCells * 30 / 50);
+    
+    // Tempatkan block random
+    for (int i = 0; i < randomBlockCount; i++) {
+        int x = GetRandomValue(0, GRID_SIZE - 1);
+        int y = GetRandomValue(0, GRID_SIZE - 1);
+        
+        // Jika posisi sudah terisi, cari posisi kosong
+        if (grid[y][x] != 0) {
+            bool found = false;
+            for (int attempts = 0; attempts < 50 && !found; attempts++) {
+                x = GetRandomValue(0, GRID_SIZE - 1);
+                y = GetRandomValue(0, GRID_SIZE - 1);
+                if (grid[y][x] == 0) {
+                    found = true;
+                }
+            }
+            if (!found) continue; // Skip jika tidak bisa menemukan posisi kosong
+        }
+        
+        // Tempatkan block random
+        grid[y][x] = GetRandomValue(1, 6);
+    }
+}
+
+void GenerateNewBatch(boolean* blockUsed) {
+    // Gunakan best block selector sebagai default
+    
+    // Generate best block
+    GenerateBestBatch(blockUsed);
+    
+    // Verifikasi hasil - jika gagal, fallback ke random
+    boolean validBatch = true;
+    for (int i = 0; i < 3; i++) {
+        int queueBlock = GetQueueAt(i);
+        if (queueBlock == -1 || queueBlock < 1 || queueBlock > 36) {
+            validBatch = false;
+            break;
+        }
+    }
+    
+    // Jika best block selector gagal, gunakan random generation
+    if (!validBatch) {
+        GenerateRandomBatch(blockUsed);
+    }
+}
+
+// Fungsi tambahan untuk memvalidasi apakah masih ada gerakan yang valid
+boolean HasAnyValidMove(boolean* blockUsed) {
+    for (int i = 0; i < 3; i++) {
+        int blockType = GetQueueAt(i);
+        
+        // Cek apakah slot ini berisi blok valid dan belum digunakan
+        if (blockType >= 1 && blockType <= 36 && !blockUsed[i]) {
+            // Cek apakah blok ini bisa ditempatkan di mana saja di grid
+            if (HasValidPlacement(blockType)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
