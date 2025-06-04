@@ -558,3 +558,33 @@ void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
         }
     }
 }
+
+
+
+void InitURUI() {
+    undoButton = (MenuButton){
+        .rect = {370, 50, 60, 35},
+        .color = (Color){90, 220, 220, 255},
+        .hoverColor = (Color){150, 150, 255, 255},
+        .textColor = BLACK,
+        .animScale = 1.0f,
+        .text = "UNDO"
+    };
+
+    redoButton = (MenuButton){
+        .rect = {300, 50, 60, 35},
+        .color = (Color){255, 200, 150, 255},
+        .hoverColor = (Color){150, 255, 150, 255},
+        .textColor = BLACK,
+        .animScale = 1.0f,
+        .text = "REDO"
+    };
+}
+
+void DrawUndoRedoButtons(Sound clickSound) {
+    UpdateMenuButton(&undoButton, clickSound);
+    UpdateMenuButton(&redoButton, clickSound);
+
+    DrawMenuButton(&undoButton);
+    DrawMenuButton(&redoButton);
+}

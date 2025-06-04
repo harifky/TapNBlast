@@ -13,19 +13,20 @@ void DrawGrids();
 
 //Score
 void DrawScorePanel();
-// GameOver
 
+// GameOver
 void DrawGameOverPanel();
 
 // draw block preview
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
 
+//draw block shadow
 void DrawBlockShadow(int cursorX, int cursorY, int blockType);
 
-
-
+//draw button
 void drawButton(Texture2D texture, Sound sfx);
 
+//draw menu
 void drawMenu();
 
 // Menu state
@@ -68,5 +69,12 @@ void DrawMainMenu(Sound clickSound);
 void DrawSettingsMenu(Sound clickSound);
 void DrawAboutMenu(Sound clickSound);
 int UpdateMainMenu(Sound clickSound);
+
+static MenuButton undoButton;
+static MenuButton redoButton;
+
+void DrawUndoRedoButtons(Sound clickSound);
+
+void InitURUI();
 
 #endif /* UI_H */

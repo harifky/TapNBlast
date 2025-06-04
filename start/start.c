@@ -1,7 +1,6 @@
 #include "start.h"
 
 int GetValidRandomBlockType() {
-    // Pastikan selalu mengembalikan blok yang valid (1-40)
     return GetRandomValue(1, 36);
 }
 
@@ -87,7 +86,7 @@ void StartGame() {
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
-        int menuResult = UpdateMainMenu(clickSound);  // Ini akan menggambar dan cek klik tombol
+        int menuResult = UpdateMainMenu(clickSound); 
 
         EndDrawing();
 
@@ -98,8 +97,9 @@ void StartGame() {
         }
     }
 
+    InitURUI();
 
-    // int blockSize = MAX_BLOCK_SIZE;
+
     boolean GameOver = true;
     int selectedIndex = 0;
     int blocksUsedInBatch = 0;
@@ -133,11 +133,23 @@ void StartGame() {
                 
                 if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
                     PlaceBlock(gx, gy, currentBlock);
+                    PushMove(&undoStack, currentBlock, gx, gy, selectedIndex);
+                    ClearStack(&redoStack);
+                    undoCount = 0;  
                     
                     blockUsed[selectedIndex] = true;
-                    blocksUsedInBatch++;
+                    // blocksUsedInBatch++;
+
+                    int usedCount = 0;
+                    for (int i = 0; i < 3; i++) {
+                        if (blockUsed[i]) usedCount++;
+                    }
                     
-                    if (blocksUsedInBatch >= 3) {
+                    if (usedCount >= 3) {
+                        ClearStack(&undoStack);
+                        ClearStack(&redoStack);
+                        undoCount = 0;
+                        redoCount = 0;
                         // Semua blok dalam batch sudah digunakan - generate batch baru
                         GenerateNewBatch(blockUsed);
                         blocksUsedInBatch = 0;
@@ -157,6 +169,7 @@ void StartGame() {
                         }
                     }
 
+
                     ClearFullLines();
                     
                     // Cek game over dengan validasi yang lebih ketat
@@ -165,6 +178,16 @@ void StartGame() {
                     }
                 }
             }
+        }
+
+        if (undoButton.isPressed) {
+            // TraceLog(LOG_INFO, "Undo button clicked");
+            PerformUndo(blockUsed);
+        }
+
+        if (redoButton.isPressed) {
+            // TraceLog(LOG_INFO, "Redo button clicked");
+            PerformRedo(blockUsed);
         }
 
         // Input untuk memilih blok dengan validasi yang lebih ketat
@@ -240,7 +263,8 @@ void StartGame() {
         if (hasEmptySlot) {
             DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
         }
-        
+
+        DrawUndoRedoButtons(clickSound);
         DrawScorePanel();
         DrawNextBlocks(selectedIndex, blockUsed);
 

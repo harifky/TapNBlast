@@ -61,4 +61,25 @@ void ClearFullLines();
 int GetQueueAt(int index);
 void ClearQueue();
 
+typedef struct Move {
+    int blockType;
+    int centerX;
+    int centerY;
+    int queueIndex;
+    struct Move* next;
+} Move;
+
+extern Move* undoStack;
+extern Move* redoStack;
+extern int undoCount;
+extern int redoCount;
+
+void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex);
+bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex);
+void ClearStack(Move** stack);
+bool PerformUndo(boolean* blockUsed);
+bool PerformRedo(boolean* blockUsed);
+
+void RemoveBlockFromGrid(int centerX, int centerY, int blockType);
+
 #endif

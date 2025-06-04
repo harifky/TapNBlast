@@ -155,3 +155,82 @@ int GetQueueSize() {
 void ClearQueue() {
     while (Dequeue() != -1);
 }
+
+
+Move* undoStack = NULL;
+Move* redoStack = NULL;
+
+void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex) {
+    Move* newMove = (Move*)malloc(sizeof(Move));
+    newMove->blockType = blockType;
+    newMove->centerX = centerX;
+    newMove->centerY = centerY;
+    newMove->queueIndex = queueIndex;
+    newMove->next = *stack;
+    *stack = newMove;
+}
+
+bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex) {
+    if (*stack == NULL) return false;
+    Move* top = *stack;
+    *blockType = top->blockType;
+    *centerX = top->centerX;
+    *centerY = top->centerY;
+    *queueIndex = top->queueIndex;
+    *stack = top->next;
+    free(top);
+    return true;
+}
+
+void ClearStack(Move** stack) {
+    while (*stack != NULL) {
+        Move* temp = *stack;
+        *stack = (*stack)->next;
+        free(temp);
+    }
+}
+
+void RemoveBlockFromGrid(int centerX, int centerY, int blockType) {
+    for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
+        int bx = centerX + (int)blockShapes[blockType][i].x;
+        int by = centerY + (int)blockShapes[blockType][i].y;
+        if (bx >= 0 && bx < GRID_SIZE && by >= 0 && by < GRID_SIZE) {
+            grid[by][bx] = 0;
+        }
+    }
+}
+
+int undoCount = 0;
+int redoCount = 0;
+
+bool PerformUndo(boolean* blockUsed) {
+    if (undoStack == NULL || undoCount >= 3) return false;
+
+    int blockType, x, y, queueIdx;
+    if (PopMove(&undoStack, &blockType, &x, &y, &queueIdx)) {
+        PushMove(&redoStack, blockType, x, y, queueIdx);
+        RemoveBlockFromGrid(x, y, blockType);
+        blockUsed[queueIdx] = false;
+        undoCount++;
+        redoCount = 0;
+        return true;
+    }
+    return false;
+}
+
+bool PerformRedo(boolean* blockUsed) {
+    if (redoStack == NULL || redoCount >= 3) return false;
+
+    int blockType, x, y, queueIdx;
+    if (PopMove(&redoStack, &blockType, &x, &y, &queueIdx)) {
+        if (CanPlaceBlock(x, y, blockType)) {
+            PlaceBlock(x, y, blockType);
+            blockUsed[queueIdx] = true;
+            PushMove(&undoStack, blockType, x, y, queueIdx);
+            redoCount++;
+            undoCount = 0;
+            return true;
+        }
+    }
+    return false;
+}
