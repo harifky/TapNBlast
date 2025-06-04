@@ -2,7 +2,7 @@
 
 int GetValidRandomBlockType() {
     // Pastikan selalu mengembalikan blok yang valid (1-40)
-    return GetRandomValue(1, 40);
+    return GetRandomValue(1, 36);
 }
 
 void GenerateNewBatch(boolean* blockUsed) {
@@ -16,10 +16,17 @@ void GenerateNewBatch(boolean* blockUsed) {
         do {
             blockType = GetValidRandomBlockType();
             attempts++;
-        } while ((blockType < 1 || blockType > 40) && attempts < 10);
+            
+            // Jika sudah 50 percobaan, gunakan blok sequential untuk memastikan validitas
+            if (attempts >= 50) {
+                blockType = (i % 36) + 1; // Gunakan blok 1-40 secara berurutan
+                break;
+            }
+        } while (blockType < 1 || blockType > 36);
         
-        if (blockType < 1 || blockType > 40) {
-            blockType = (i % 40) + 1;
+        // Double check - pastikan blockType valid
+        if (blockType < 1 || blockType > 36) {
+            blockType = (i % 40) + 1; // Fallback ke blok sequential
         }
         
         newBlocks[i] = blockType;
@@ -29,7 +36,18 @@ void GenerateNewBatch(boolean* blockUsed) {
     // Baru setelah semua siap, replace queue sekaligus
     ClearQueue();
     for (int i = 0; i < 3; i++) {
-        Enqueue(newBlocks[i]);
+        int queueBlock = GetQueueAt(i);
+        if (queueBlock == -1 || queueBlock < 1 || queueBlock > 36) {
+            // Jika ada blok yang tidak valid, ganti dengan blok default
+            // Asumsi ada fungsi untuk mengatur elemen queue secara langsung
+            // Atau bisa menggunakan ClearQueue dan rebuild seluruhnya
+            ClearQueue();
+            for (int j = 0; j < 3; j++) {
+                Enqueue((j % 36) + 1); // Gunakan blok 1, 2, 3 sebagai fallback
+                blockUsed[j] = false;
+            }
+            break;
+        }
     }
 }
 
@@ -39,7 +57,7 @@ boolean HasAnyValidMove(boolean* blockUsed) {
         int blockType = GetQueueAt(i);
         
         // Cek apakah slot ini berisi blok valid dan belum digunakan
-        if (blockType >= 1 && blockType <= 40 && !blockUsed[i]) {
+        if (blockType >= 1 && blockType <= 36 && !blockUsed[i]) {
             // Cek apakah blok ini bisa ditempatkan di mana saja di grid
             if (HasValidPlacement(blockType)) {
                 return true;
@@ -54,15 +72,23 @@ void StartGame() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
     SetTargetFPS(60);
     srand(time(NULL));
+    InitAudioDevice();
 
+    Sound clickSound = LoadSound("assets/buttonfx.wav");
+    
+    SetSoundVolume(clickSound, 1.0f);
+    if (!IsAudioDeviceReady()) {
+    TraceLog(LOG_ERROR, "Audio device not ready!");
+}
+    
+    
     InitMainMenu();
 
     // Tampilkan menu utama sampai user klik tombol Play atau Exit
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
-
-        int menuResult = UpdateMainMenu();  // Ini akan menggambar dan cek klik tombol
+        int menuResult = UpdateMainMenu(clickSound);  // Ini akan menggambar dan cek klik tombol
 
         EndDrawing();
 
@@ -104,7 +130,7 @@ void StartGame() {
             
             // Validasi tambahan untuk memastikan currentBlock valid
             if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT && 
-                currentBlock >= 1 && currentBlock <= 40 && !blockUsed[selectedIndex]) {
+                currentBlock >= 1 && currentBlock <= 36 && !blockUsed[selectedIndex]) {
                 
                 if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
                     PlaceBlock(gx, gy, currentBlock);
@@ -124,10 +150,10 @@ void StartGame() {
                         do {
                             nextIndex = (nextIndex + 1) % 3;
                             attempts++;
-                        } while (attempts < 3 && (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 || GetQueueAt(nextIndex) > 40));
+                        } while (attempts < 3 && (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 || GetQueueAt(nextIndex) > 36));
                         
                         // Jika ditemukan slot valid, gunakan itu
-                        if (attempts < 3 && !blockUsed[nextIndex] && GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 40) {
+                        if (attempts < 3 && !blockUsed[nextIndex] && GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 36) {
                             selectedIndex = nextIndex;
                         }
                     }
@@ -145,19 +171,19 @@ void StartGame() {
         // Input untuk memilih blok dengan validasi yang lebih ketat
         if (IsKeyPressed(KEY_ONE)) {
             int blockType = GetQueueAt(0);
-            if (!blockUsed[0] && blockType >= 1 && blockType <= 40) {
+            if (!blockUsed[0] && blockType >= 1 && blockType <= 36) {
                 selectedIndex = 0;
             }
         }
         if (IsKeyPressed(KEY_TWO)) {
             int blockType = GetQueueAt(1);
-            if (!blockUsed[1] && blockType >= 1 && blockType <= 40) {
+            if (!blockUsed[1] && blockType >= 1 && blockType <= 36) {
                 selectedIndex = 1;
             }
         }
         if (IsKeyPressed(KEY_THREE)) {
             int blockType = GetQueueAt(2);
-            if (!blockUsed[2] && blockType >= 1 && blockType <= 40) {
+            if (!blockUsed[2] && blockType >= 1 && blockType <= 36) {
                 selectedIndex = 2;
             }
         }
@@ -179,6 +205,7 @@ void StartGame() {
             GameOver = true;
             selectedIndex = 0;
             blocksUsedInBatch = 0;
+            Dequeue();
             
             // Generate batch baru yang valid
             GenerateNewBatch(blockUsed);
@@ -188,7 +215,7 @@ void StartGame() {
         Vector2 mousePos = GetMousePosition();
         int blockType = GetQueueAt(selectedIndex);
         
-        if (blockType >= 1 && blockType <= 40 && !blockUsed[selectedIndex]) {
+        if (blockType >= 1 && blockType <= 36 && !blockUsed[selectedIndex]) {
             DrawBlockShadow((int)mousePos.x, (int)mousePos.y, blockType);
         }
 
@@ -206,7 +233,7 @@ void StartGame() {
         // Tampilkan peringatan jika ada slot kosong (untuk debugging)
         boolean hasEmptySlot = false;
         for (int i = 0; i < 3; i++) {
-            if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 40) {
+            if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 36) {
                 hasEmptySlot = true;
                 break;
             }
@@ -220,6 +247,9 @@ void StartGame() {
 
         EndDrawing();
     }
+
+    UnloadSound(clickSound);
+    CloseAudioDevice();
 
     CloseWindow();
 }

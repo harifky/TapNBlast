@@ -105,7 +105,7 @@ void InitMainMenu() {
         .color = (Color){70, 130, 180, 255},      // Steel Blue
         .hoverColor = (Color){100, 149, 237, 255}, // Cornflower Blue
         .textColor = WHITE,
-        .animScale = 1.0f
+        .animScale = 1.0f,
     };
     strcpy(playButton.text, "PLAY GAME");
     
@@ -151,14 +151,24 @@ void InitMainMenu() {
 }
 
 // Update button animation and interaction
-void UpdateMenuButton(MenuButton* button) {
+void UpdateMenuButton(MenuButton* button, Sound clickSound) {
+
+
     Vector2 mousePos = GetMousePosition();
+    bool wasPressed = button->isPressed;
     button->isHovered = CheckCollisionPointRec(mousePos, button->rect);
     button->isPressed = button->isHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+    
+    if (button->isPressed && !wasPressed) {
+        TraceLog(LOG_INFO, "Button '%s' pressed!", button->text);
+        PlaySound(clickSound);
+        TraceLog(LOG_INFO, "Button '%s' sounded!", button->text);
+    }
     
     // Smooth animation
     float targetScale = button->isHovered ? 1.05f : 1.0f;
     button->animScale += (targetScale - button->animScale) * 0.15f;
+
 }
 
 // Draw animated button
@@ -251,15 +261,15 @@ void DrawGameTitle() {
 }
 
 // Draw main menu
-void DrawMainMenu() {
+void DrawMainMenu(Sound clickSound) {
     DrawMenuBackground();
     DrawGameTitle();
     
     // Update and draw buttons
-    UpdateMenuButton(&playButton);
-    UpdateMenuButton(&settingsButton);
-    UpdateMenuButton(&aboutButton);
-    UpdateMenuButton(&exitButton);
+    UpdateMenuButton(&playButton, clickSound);
+    UpdateMenuButton(&settingsButton, clickSound);
+    UpdateMenuButton(&aboutButton, clickSound);
+    UpdateMenuButton(&exitButton, clickSound);
     
     DrawMenuButton(&playButton);
     DrawMenuButton(&settingsButton);
@@ -268,10 +278,11 @@ void DrawMainMenu() {
     
     // Draw version info
     DrawText("v0.0.1", SCREEN_WIDTH - 60, SCREEN_HEIGHT - 25, 12, (Color){150, 150, 150, 255});
+
 }
 
 // Draw settings menu
-void DrawSettingsMenu() {
+void DrawSettingsMenu(Sound clickSound) {
     DrawMenuBackground();
     
     // Settings title
@@ -286,12 +297,12 @@ void DrawSettingsMenu() {
     DrawText("Difficulty: Normal", SCREEN_WIDTH/2 - 70, 290, 20, WHITE);
     DrawText("Controls: Mouse", SCREEN_WIDTH/2 - 65, 320, 20, WHITE);
     
-    UpdateMenuButton(&backButton);
+    UpdateMenuButton(&backButton, clickSound);
     DrawMenuButton(&backButton);
 }
 
 // Draw about menu
-void DrawAboutMenu() {
+void DrawAboutMenu(Sound clickSound) {
     DrawMenuBackground();
     
     // About title
@@ -311,17 +322,17 @@ void DrawAboutMenu() {
     DrawText("", SCREEN_WIDTH/2 - 0, 395, 14, WHITE);
     DrawText("Made with Raylib & C", SCREEN_WIDTH/2 - 75, 420, 14, (Color){150, 150, 150, 255});
     
-    UpdateMenuButton(&backButton);
+    UpdateMenuButton(&backButton, clickSound);
     DrawMenuButton(&backButton);
 }
 
 // Main menu update and render function
-int UpdateMainMenu() {
+int UpdateMainMenu(Sound clickSound) {
     menuAnimTime += GetFrameTime();
     
     switch (currentMenuState) {
         case MENU_MAIN:
-            DrawMainMenu();
+            DrawMainMenu(clickSound);
             
             // Handle button clicks
             if (playButton.isPressed) {
@@ -339,14 +350,14 @@ int UpdateMainMenu() {
             break;
             
         case MENU_SETTINGS:
-            DrawSettingsMenu();
+            DrawSettingsMenu(clickSound);
             if (backButton.isPressed) {
                 currentMenuState = MENU_MAIN;
             }
             break;
             
         case MENU_ABOUT:
-            DrawAboutMenu();
+            DrawAboutMenu(clickSound);
             if (backButton.isPressed) {
                 currentMenuState = MENU_MAIN;
             }
@@ -488,7 +499,7 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
 }
 
 void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
-    if (blockType < 1 || blockType > 40) return;
+    if (blockType < 1 || blockType > 36) return;
     
     // Hitung posisi grid dari posisi kursor
     int gridX = (int)((cursorX - gridOriginX) / TILE_SIZE);
