@@ -4,8 +4,9 @@
 #include "global.h"
 #include "gameLogic.h"
 #include "animation.h"
+#include "leaderboard.h"
 #include "raylib.h"
-
+#include "leaderboard.h"
 
 
 // UI functions
@@ -15,7 +16,7 @@ void DrawGrids();
 void DrawScorePanel();
 
 // GameOver
-void DrawGameOverPanel();
+void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration);
 
 // draw block preview
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
@@ -23,7 +24,6 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
 //draw block shadow
 void DrawBlockShadow(int cursorX, int cursorY, int blockType);
 
-//draw button
 void drawButton(Texture2D texture, Sound sfx);
 
 //draw menu
@@ -45,7 +45,6 @@ typedef struct {
     bool isHovered;
     bool isPressed;
     float animScale;
-    Sound clickSound;
 } MenuButton;
 
 // Menu variables
@@ -65,9 +64,10 @@ void InitMainMenu();
 void UpdateMenuButton(MenuButton* button, Sound clickSound);
 void DrawMenuBackground();
 void DrawGameTitle();
-void DrawMainMenu(Sound clickSound);
-void DrawSettingsMenu(Sound clickSound);
-void DrawAboutMenu(Sound clickSound);
-int UpdateMainMenu(Sound clickSound);
+void DrawMainMenu();
+void DrawSettingsMenu();
+void DrawAboutMenu();
+int UpdateMainMenu();
+
 
 #endif /* UI_H */
