@@ -70,11 +70,4 @@ void DrawSettingsMenu(Sound clickSound);
 void DrawAboutMenu(Sound clickSound);
 int UpdateMainMenu(Sound clickSound);
 
-static MenuButton undoButton;
-static MenuButton redoButton;
-
-void DrawUndoRedoButtons(Sound clickSound);
-
-void InitURUI();
-
 #endif /* UI_H */

@@ -158,25 +158,26 @@ void ClearQueue() {
 
 
 Move* undoStack = NULL;
-Move* redoStack = NULL;
 
-void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex) {
+void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex, boolean isScored) {
     Move* newMove = (Move*)malloc(sizeof(Move));
     newMove->blockType = blockType;
     newMove->centerX = centerX;
     newMove->centerY = centerY;
     newMove->queueIndex = queueIndex;
+    newMove->isScored = isScored;  // Simpan flag apakah block ini sudah memberi score
     newMove->next = *stack;
     *stack = newMove;
 }
 
-bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex) {
+bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex, boolean* isScored) {
     if (*stack == NULL) return false;
     Move* top = *stack;
     *blockType = top->blockType;
     *centerX = top->centerX;
     *centerY = top->centerY;
     *queueIndex = top->queueIndex;
+    *isScored = top->isScored;  // ← kembalikan flag
     *stack = top->next;
     free(top);
     return true;
@@ -207,30 +208,16 @@ bool PerformUndo(boolean* blockUsed) {
     if (undoStack == NULL || undoCount >= 3) return false;
 
     int blockType, x, y, queueIdx;
-    if (PopMove(&undoStack, &blockType, &x, &y, &queueIdx)) {
-        PushMove(&redoStack, blockType, x, y, queueIdx);
+    boolean isScored;
+    if (PopMove(&undoStack, &blockType, &x, &y, &queueIdx, &isScored)) {
+        if (isScored) {
+            return false;
+        }
+
         RemoveBlockFromGrid(x, y, blockType);
         blockUsed[queueIdx] = false;
         undoCount++;
-        redoCount = 0;
         return true;
-    }
-    return false;
-}
-
-bool PerformRedo(boolean* blockUsed) {
-    if (redoStack == NULL || redoCount >= 3) return false;
-
-    int blockType, x, y, queueIdx;
-    if (PopMove(&redoStack, &blockType, &x, &y, &queueIdx)) {
-        if (CanPlaceBlock(x, y, blockType)) {
-            PlaceBlock(x, y, blockType);
-            blockUsed[queueIdx] = true;
-            PushMove(&undoStack, blockType, x, y, queueIdx);
-            redoCount++;
-            undoCount = 0;
-            return true;
-        }
     }
     return false;
 }

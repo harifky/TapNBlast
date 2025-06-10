@@ -97,8 +97,6 @@ void StartGame() {
         }
     }
 
-    InitURUI();
-
 
     boolean GameOver = true;
     int selectedIndex = 0;
@@ -132,9 +130,14 @@ void StartGame() {
                 currentBlock >= 1 && currentBlock <= 36 && !blockUsed[selectedIndex]) {
                 
                 if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
+                    int previousScore = score;
+
                     PlaceBlock(gx, gy, currentBlock);
-                    PushMove(&undoStack, currentBlock, gx, gy, selectedIndex);
-                    ClearStack(&redoStack);
+                    
+                    ClearFullLines();
+                    boolean isScored = (score > previousScore);
+                    PushMove(&undoStack, currentBlock, gx, gy, selectedIndex, isScored);
+                    // ClearStack(&undoStack);
                     undoCount = 0;  
                     
                     blockUsed[selectedIndex] = true;
@@ -147,9 +150,7 @@ void StartGame() {
                     
                     if (usedCount >= 3) {
                         ClearStack(&undoStack);
-                        ClearStack(&redoStack);
                         undoCount = 0;
-                        redoCount = 0;
                         // Semua blok dalam batch sudah digunakan - generate batch baru
                         GenerateNewBatch(blockUsed);
                         blocksUsedInBatch = 0;
@@ -170,8 +171,8 @@ void StartGame() {
                     }
 
 
-                    ClearFullLines();
-                    
+
+
                     // Cek game over dengan validasi yang lebih ketat
                     if (!HasAnyValidMove(blockUsed)) {
                         GameOver = false;
@@ -180,14 +181,9 @@ void StartGame() {
             }
         }
 
-        if (undoButton.isPressed) {
-            // TraceLog(LOG_INFO, "Undo button clicked");
+        if (IsKeyPressed(KEY_Z)) {
+            TraceLog(LOG_INFO, "Undo button clicked");
             PerformUndo(blockUsed);
-        }
-
-        if (redoButton.isPressed) {
-            // TraceLog(LOG_INFO, "Redo button clicked");
-            PerformRedo(blockUsed);
         }
 
         // Input untuk memilih blok dengan validasi yang lebih ketat
@@ -264,7 +260,6 @@ void StartGame() {
             DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
         }
 
-        DrawUndoRedoButtons(clickSound);
         DrawScorePanel();
         DrawNextBlocks(selectedIndex, blockUsed);
 
