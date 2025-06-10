@@ -313,10 +313,10 @@ void DrawAboutMenu(Sound clickSound) {
     DrawRectangleRoundedLines((Rectangle){SCREEN_WIDTH/2 - 200, 180, 400, 300}, 0.1f, 10, (Color){100, 100, 150, 255});
     
     DrawText("TAP N BLAST", SCREEN_WIDTH/2 - 80, 210, 24, (Color){255, 215, 0, 255});
-    DrawText("A fun block puzzle game", SCREEN_WIDTH/2 - 85, 240, 16, WHITE);
+    DrawText("Adalah permainan Blok", SCREEN_WIDTH/2 - 85, 240, 16, WHITE);
     DrawText("", SCREEN_WIDTH/2 - 0, 270, 16, WHITE);
     DrawText("HOW TO PLAY:", SCREEN_WIDTH/2 - 55, 300, 18, (Color){100, 255, 100, 255});
-    DrawText("• Place blocks on the grid", SCREEN_WIDTH/2 - 90, 325, 14, WHITE);
+    DrawText("• Letakkan Blok didalam grid", SCREEN_WIDTH/2 - 90, 325, 14, WHITE);
     DrawText("• Fill rows or columns to clear them", SCREEN_WIDTH/2 - 105, 345, 14, WHITE);
     DrawText("• Score points and avoid game over!", SCREEN_WIDTH/2 - 105, 365, 14, WHITE);
     DrawText("", SCREEN_WIDTH/2 - 0, 395, 14, WHITE);
