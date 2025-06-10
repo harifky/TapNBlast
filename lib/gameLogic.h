@@ -66,4 +66,8 @@ void InitializeRandomGrid();
 void GenerateRandomBatch(boolean* blockUsed);
 int GetValidRandomBlockType();
 
+int comboCount = 0;
+int lastClearTurn = -1;  // Turn terakhir ada clear
+int currentTurn = 0;  // Turn saat ini
+
 #endif

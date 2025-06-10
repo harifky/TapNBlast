@@ -5,7 +5,7 @@
 #include "gameLogic.h"
 #include "animation.h"
 #include "raylib.h"
-
+#include "leaderboard.h"
 
 
 // UI functions
@@ -15,7 +15,7 @@ void DrawGrids();
 void DrawScorePanel();
 // GameOver
 
-void DrawGameOverPanel();
+void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration);
 
 // draw block preview
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
@@ -68,5 +68,6 @@ void DrawMainMenu(Sound clickSound);
 void DrawSettingsMenu(Sound clickSound);
 void DrawAboutMenu(Sound clickSound);
 int UpdateMainMenu(Sound clickSound);
+
 
 #endif /* UI_H */

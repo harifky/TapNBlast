@@ -80,9 +80,12 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType){
 }
 
 void ClearFullLines(){
-
     Sound Scoresound = LoadSound("assets/scorecoint.wav");
-   
+    
+    int clearedLines = 0;
+    bool hasCleared = false;
+    
+    // Check dan clear baris penuh
     for (int y = 0; y < GRID_SIZE; y++) {
         boolean full = true;
         for (int x = 0; x < GRID_SIZE; x++) {
@@ -93,11 +96,12 @@ void ClearFullLines(){
         }
         if (full) {
             for (int x = 0; x < GRID_SIZE; x++) grid[y][x] = 0;
-            score = score + 100;
-            PlaySound(Scoresound);
+            clearedLines++;
+            hasCleared = true;
         }
     }
     
+    // Check dan clear kolom penuh
     for (int x = 0; x < GRID_SIZE; x++) {
         boolean full = true;
         for (int y = 0; y < GRID_SIZE; y++) {
@@ -108,10 +112,51 @@ void ClearFullLines(){
         }
         if (full) {
             for (int y = 0; y < GRID_SIZE; y++) grid[y][x] = 0;
-            score = score + 100;
-            PlaySound(Scoresound);
+            clearedLines++;
+            hasCleared = true;
         }
     }
+    
+    if (hasCleared) {
+        // Hitung base score berdasarkan jumlah baris/kolom yang di-clear
+        int baseScore = 0;
+        switch(clearedLines) {
+            case 1: baseScore = 100; break;
+            case 2: baseScore = 250; break;
+            case 3: baseScore = 400; break;
+            default: 
+                // Untuk 4 atau lebih lines (lebih dari 3 sekaligus)
+                baseScore = 600;
+                break;
+        }
+        
+        // Check apakah ini combo (clear berturut-turut)
+        if (currentTurn == lastClearTurn + 1) {
+            comboCount++;
+        } else {
+            comboCount = 0;  // Reset combo jika tidak berturut-turut
+        }
+        
+        // Hitung combo bonus
+        float comboMultiplier = 1.0f + (comboCount * 0.5f);  // +50% per combo
+        int finalScore = (int)(baseScore * comboMultiplier);
+        
+        // Tambahkan ke total score
+        score += finalScore;
+        
+        // Update tracking variables
+        lastClearTurn = currentTurn;
+        
+        // Play sound
+        PlaySound(Scoresound);
+        
+        // Optional: Print info untuk debugging
+        printf("Lines cleared: %d, Base score: %d, Combo: %d, Final score: %d\n", 
+               clearedLines, baseScore, comboCount, finalScore);
+    }
+    
+    // Increment turn counter (panggil ini setiap kali piece ditempatkan)
+    currentTurn++;
 }
 
 void RemoveBlockFromQueue(int index) {

@@ -8,6 +8,7 @@
 #include "../lib/boolean.h"
 #include "../lib/sound.h"
 #include "../lib/tree.h"
+#include "../lib/leaderboard.h"
 
 
 #include "../src/animation.c"
@@ -15,6 +16,7 @@
 #include "../src/ui.c"
 #include "../src/sound.c"
 #include "../src/tree.c"
+#include "../src/leaderboard.c"
 
 #include "raylib.h"
 

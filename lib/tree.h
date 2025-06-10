@@ -19,8 +19,8 @@ typedef struct {
     boolean valid;
 } BatchResult;
 
-// Fungsi utama
-void GenerateBestBatch(boolean* blockUsed);
+// void GenerateBestBatch(boolean* blockUsed);
+void GenerateBestBatch(boolean* blockUsedOutput);
 
 // Fungsi pendukung
 void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE]);
@@ -33,9 +33,10 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
 TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int maxDepth);
 void FreeTree(TreeNode* node);
 BatchResult EvaluateBlockSequence(int cloneGrid[GRID_SIZE][GRID_SIZE], int block1, int block2, int block3);
+TreeNode* FindBestPositionForBlock_ForAllTypes(int currentGrid[GRID_SIZE][GRID_SIZE]);
 
 // void PrintTree(TreeNode* node, int depth);
-
+int maxDepth=2;
 
 
 #endif
