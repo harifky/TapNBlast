@@ -2,11 +2,6 @@
 #include "../lib/global.h"
 #include "../lib/tree.h"
 
-// Variabel global untuk tracking combo
-int comboCount = 0;
-int lastClearTurn = -1;  // Turn terakhir ada clear
-int currentTurn = 0;     // Turn saat ini
-
 void Enqueue(int blockType) {
     QueueNode *newNode = (QueueNode *)malloc(sizeof(QueueNode));
     newNode->blockType = blockType;

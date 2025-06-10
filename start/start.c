@@ -1,13 +1,5 @@
 #include "start.h"
 
-UsernameInput usernameInput;
-bool isInGameOverInput = false;
-bool leaderboardSaved = false;
-time_t gameStartTime;
-int gameDuration;
-int finalGameDuration = 0;
-bool shouldReturnToMenu = false;
-
 void StartGame() {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
   SetTargetFPS(60);
