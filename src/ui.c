@@ -367,11 +367,6 @@ int UpdateMainMenu(Sound clickSound) {
     
     return 0; // Stay in menu
 }
-// void DrawGameOverPanel() {
-//     DrawText("GAME OVER!", SCREEN_WIDTH/2 - 80, SCREEN_HEIGHT/2 - 40, 28, (Color){200, 50, 50, 255});
-//     DrawText(TextFormat("Final Score: %d", score), SCREEN_WIDTH/2 - 90, SCREEN_HEIGHT/2, 20, UI_TEXT);
-//     DrawText("Press R to Restart", SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 30, 18, UI_TEXT);
-// }
 
 void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration) {
     // Background overlay
@@ -430,14 +425,11 @@ void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration) {
     if (usernameInput->isActive) {
         DrawText("Press ENTER to confirm", panelX + 30, panelY + 240, 14, (Color){200, 200, 200, 255});
         DrawText("Press BACKSPACE to delete", panelX + 30, panelY + 260, 14, (Color){200, 200, 200, 255});
-        // ADDED: Show ESC option
-        DrawText("Press ESC to skip", panelX + 200, panelY + 240, 14, (Color){200, 200, 200, 255});
     } else if (usernameInput->isComplete) {
         // FIXED: Remove "Saving..." message since we return immediately
         DrawText("Score saved!", panelX + 30, panelY + 240, 16, (Color){100, 255, 100, 255});
     }
 }
-
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
     // Posisi baru - di bawah grid dan di tengah
     int panelWidth = 370;  // Panel lebih lebar untuk jarak lebih banyak

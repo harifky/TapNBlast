@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include "boolean.h"
 
 #define SCREEN_WIDTH 450
 #define SCREEN_HEIGHT 650
@@ -29,6 +30,15 @@
 #define PADDING 2
 #define GRID_WIDTH 10
 #define GRID_HEIGHT 10
+
+#define SCORE_PER_LINE_CLEARED 100
+#define SCORE_PER_FILLED_CELL 5
+#define BONUS_FOR_MULTIPLE_LINES_FACTOR 50
+
+#define PENALTY_PER_HOLE 75
+#define PENALTY_PER_AGGREGATE_HEIGHT_POINT 2 
+#define PENALTY_PER_BUMPINESS_POINT 5      
+#define PENALTY_PER_MAX_HEIGHT_POINT 1     
 
 #define UI_BORDER (Color){ 80, 90, 120, 255 }
 #define UI_GRID_BG (Color){ 200, 200, 210, 255 }

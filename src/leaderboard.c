@@ -216,3 +216,10 @@ void UpdateUsernameInput(UsernameInput* input) {
         input->isActive = false;
     }
 }
+
+void ReturnToMainMenu() {
+  // Reset semua variabel game
+  isInGameOverInput = false;
+  leaderboardSaved = false;
+  shouldReturnToMenu = true; // Set flag instead of calling StartGame
+}

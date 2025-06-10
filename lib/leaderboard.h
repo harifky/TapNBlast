@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "boolean.h"
 
 #define MAX_USERNAME_LENGTH 20
 #define MAX_LEADERBOARD_ENTRIES 50
@@ -22,8 +23,8 @@ typedef struct {
 typedef struct {
     char inputText[MAX_USERNAME_LENGTH];
     int currentLength;
-    bool isActive;
-    bool isComplete;
+    boolean isActive;
+    boolean isComplete;
 } UsernameInput;
 
 // Fungsi-fungsi leaderboard
@@ -35,11 +36,20 @@ void SortLeaderboard(LeaderboardEntry entries[], int count);
 int GetLeaderboardRank(int score);
 void DisplayLeaderboard(LeaderboardEntry entries[], int count);
 void FormatDuration(int seconds, char* buffer, int bufferSize);
+void ReturnToMainMenu();
 
 // Fungsi untuk input username
 void InitUsernameInput(UsernameInput* input);
 void UpdateUsernameInput(UsernameInput* input);
 void DrawUsernameInput(UsernameInput* input, int score, int duration);
+
+UsernameInput usernameInput;
+boolean isInGameOverInput = false;
+boolean leaderboardSaved = false;
+time_t gameStartTime;
+int gameDuration;
+int finalGameDuration = 0;
+boolean shouldReturnToMenu = false;
 
 
 #endif

@@ -2,12 +2,12 @@
 #define GAMELOGIC_H
 
 #include "global.h"
-#include "boolean.h"
 
 typedef struct QueueNode {
     int blockType;
     struct QueueNode *next;
 } QueueNode;
+
 
 QueueNode *queueFront = NULL;
 QueueNode *queueRear = NULL;
@@ -60,5 +60,14 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType);
 void ClearFullLines();
 int GetQueueAt(int index);
 void ClearQueue();
+boolean HasAnyValidMove(boolean* blockUsed);
+void GenerateNewBatch(boolean* blockUsed);
+void InitializeRandomGrid();
+void GenerateRandomBatch(boolean* blockUsed);
+int GetValidRandomBlockType();
+
+int comboCount = 0;
+int lastClearTurn = -1;  // Turn terakhir ada clear
+int currentTurn = 0;  // Turn saat ini
 
 #endif

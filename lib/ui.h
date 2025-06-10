@@ -6,7 +6,7 @@
 #include "animation.h"
 #include "leaderboard.h"
 #include "raylib.h"
-
+#include "leaderboard.h"
 
 
 // UI functions
@@ -66,5 +66,6 @@ void DrawMainMenu();
 void DrawSettingsMenu();
 void DrawAboutMenu();
 int UpdateMainMenu();
+
 
 #endif /* UI_H */
