@@ -289,7 +289,9 @@ void GenerateNewBatch(boolean* blockUsed) {
     // Gunakan best block selector sebagai default
     
     // Generate best block
-    GenerateBestBatch(blockUsed);
+    
+        GenerateBestBatch(blockUsed); //tree
+    
     
     // Verifikasi hasil - jika gagal, fallback ke random
     boolean validBatch = true;

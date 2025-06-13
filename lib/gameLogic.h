@@ -31,7 +31,8 @@ const Vector2 blockShapes[BLOCK_TYPES][9] = {
 	  {{0,0},{0,1},{1,0}},
 	  {{0,0},{1,-1},{1,0}},
 	  {{0,0},{1,1},{1,0}},
-	  {{0,0}},
+	  {{0,0},{1,0},{0,1},{1,1},{0,2},{1,2}},
+	  {{0,0},{1,0},{2,0},{0,1},{1,1},{2,1}},
 	  {{0,0},{1,0},{2,0},{0,1},{1,1},{2,1},{0,2},{1,2},{2,2}},
 	  {{0,0},{1,0},{0,1},{-1,1}},        
       {{0,0},{-1,0},{0,1},{1,1}},        
@@ -65,6 +66,7 @@ void GenerateNewBatch(boolean* blockUsed);
 void InitializeRandomGrid();
 void GenerateRandomBatch(boolean* blockUsed);
 int GetValidRandomBlockType();
+void RemoveBlockFromQueue(int index);
 
 int comboCount = 0;
 int lastClearTurn = -1;  // Turn terakhir ada clear

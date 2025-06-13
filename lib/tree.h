@@ -19,8 +19,9 @@ typedef struct {
     boolean valid;
 } BatchResult;
 
-// void GenerateBestBatch(boolean* blockUsed);
-void GenerateBestBatch(boolean* blockUsedOutput);
+void GenerateBestBatchs(boolean* blockUsed);
+void GenerateBestBatch(boolean* used);
+boolean IsGridEmpty(int grid[GRID_SIZE][GRID_SIZE]);
 
 // Fungsi pendukung
 void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE]);

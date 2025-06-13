@@ -48,6 +48,7 @@ void StartGame() {
         leaderboardSaved = false;
         score = 0;
 
+
         GenerateNewBatch(blockUsed);
 
         PlayBacksoundGame();
@@ -62,6 +63,10 @@ void StartGame() {
         while (!WindowShouldClose() && !shouldReturnToMenu) {
             BeginDrawing();
             ClearBackground(PURPLE);
+
+            if (IsGridEmpty(grid)) {
+               InitializeRandomGrid();
+            } 
 
             if (isInGameOverInput) {
                 PlayGameOverSound();
@@ -187,7 +192,6 @@ void StartGame() {
                     blockUsed[1] ? "Used" : "Ready", GetQueueAt(1),
                     blockUsed[2] ? "Used" : "Ready", GetQueueAt(2),
                     blocksUsedInBatch, selectedIndex + 1);
-            DrawText(batchInfo, 10, SCREEN_HEIGHT - 65, 12, BLACK);
 
             DrawScorePanel();
             DrawNextBlocks(selectedIndex, blockUsed);
