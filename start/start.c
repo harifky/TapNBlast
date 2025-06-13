@@ -42,6 +42,7 @@ void StartGame() {
         leaderboardSaved = false;
         score = 0;
 
+
         GenerateNewBatch(blockUsed);
 
         while (selectedIndex < 3 && (GetQueueAt(selectedIndex) == -1 || blockUsed[selectedIndex])) {
@@ -54,6 +55,10 @@ void StartGame() {
         while (!WindowShouldClose() && !shouldReturnToMenu) {
             BeginDrawing();
             ClearBackground(PURPLE);
+
+            if (IsGridEmpty(grid)) {
+               InitializeRandomGrid();
+            } 
 
             if (isInGameOverInput) {
                 UpdateUsernameInput(&usernameInput);
