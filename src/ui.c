@@ -429,9 +429,10 @@ void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration) {
         DrawText("Score saved!", panelX + 30, panelY + 240, 16, (Color){100, 255, 100, 255});
     }
 }
+
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
     // Posisi baru - di bawah grid dan di tengah
-    int panelWidth = 370;  // Panel lebih lebar untuk jarak lebih banyak
+    int panelWidth = 380;  // Panel lebih lebar untuk jarak lebih banyak
     int panelHeight = 110; // Panel lebih tinggi untuk blok lebih besar
     int panelX = (SCREEN_WIDTH - panelWidth) / 2;
     int panelY = gridOriginY + GRID_SIZE * TILE_SIZE + 20; // 20px spacing dari grid
