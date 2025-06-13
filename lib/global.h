@@ -11,7 +11,7 @@
 #include "boolean.h"
 
 #define SCREEN_WIDTH 450
-#define SCREEN_HEIGHT 670
+#define SCREEN_HEIGHT 700
 #define TILE_SIZE 45
 #define GRID_SIZE 9
 #define MAX_UNDO 3

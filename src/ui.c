@@ -441,10 +441,10 @@ void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration) {
 
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
     // Posisi baru - di bawah grid dan di tengah
-    int panelWidth = 380;  // Panel lebih lebar untuk jarak lebih banyak
-    int panelHeight = 110; // Panel lebih tinggi untuk blok lebih besar
+    int panelWidth = 380;
+    int panelHeight = 130;
     int panelX = (SCREEN_WIDTH - panelWidth) / 2;
-    int panelY = gridOriginY + GRID_SIZE * TILE_SIZE + 20; // 20px spacing dari grid
+    int panelY = gridOriginY + GRID_SIZE * TILE_SIZE + 20;
     
     // Draw Next Blocks panel
     DrawRectangleRounded(
@@ -461,40 +461,37 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
         UI_BORDER
     );
     
-    // Draw Next Blocks title - dipindahkan ke tengah atas panel
+    // Draw Next Blocks title
     DrawText("NEXT BLOCKS", panelX + (panelWidth/2) - 60, panelY + 10, 16, UI_TEXT);
     
-    // Draw the upcoming blocks - diposisikan lurus di tengah dengan jarak yang lebih jauh
-    int blockSpacing = 110;  // Meningkatkan jarak antar blok secara signifikan
-    int startX = panelX + (panelWidth - 3 * blockSpacing) / 2;
+    // Ukuran slot dan jarak yang diperbaiki
+    int slotSize = 80;  // Ukuran slot lebih besar
+    int blockSpacing = 100;  // Jarak antar slot
+    int startX = panelX + (panelWidth - 3 * blockSpacing + (blockSpacing - slotSize)) / 2;
     
     for (int i = 0; i < 3; i++) {
         int type = GetQueueAt(i);
-        int blockX = startX + i * blockSpacing;
-        int blockY = panelY + 35;
+        int slotX = startX + i * blockSpacing;
+        int slotY = panelY + 35;
         
-        // TAMBAHAN: Cek apakah blok sudah digunakan
+        // Cek status blok
         boolean isUsed = blockUsed[i];
         boolean isEmpty = (type == -1);
         
-        // Draw slot background - berbeda untuk slot kosong, terpakai, dan tersedia
+        // Draw slot background
         Color slotBg;
         if (isUsed) {
-            // Blok sudah digunakan - warna abu-abu sangat gelap
             slotBg = (Color){ 40, 40, 40, 200 };
         } else if (isEmpty) {
-            // Slot kosong - warna abu-abu gelap
             slotBg = (Color){ 60, 60, 60, 200 };
         } else if (i == selectedIndex) {
-            // Slot terpilih - warna biru muda
             slotBg = (Color){ 100, 180, 255, 255 };
         } else {
-            // Slot terisi tapi tidak terpilih - warna default
             slotBg = (Color){ 80, 80, 80, 150 };
         }
         
         DrawRectangleRounded(
-            (Rectangle){blockX - 5, blockY - 5, 70, 70},
+            (Rectangle){slotX, slotY, slotSize, slotSize},
             0.15f,
             10,
             slotBg
@@ -503,44 +500,97 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
         // Draw slot border
         Color borderColor;
         if (isUsed) {
-            borderColor = (Color){60, 60, 60, 255}; // Border gelap untuk blok terpakai
+            borderColor = (Color){60, 60, 60, 255};
         } else if (i == selectedIndex) {
-            borderColor = (Color){255, 255, 255, 255}; // Border putih untuk terpilih
+            borderColor = (Color){255, 255, 255, 255};
         } else {
-            borderColor = (Color){120, 120, 120, 255}; // Border default
+            borderColor = (Color){120, 120, 120, 255};
         }
         
         DrawRectangleRoundedLines(
-            (Rectangle){blockX - 5, blockY - 5, 70, 70},
+            (Rectangle){slotX, slotY, slotSize, slotSize},
             0.15f,
             10,
             borderColor
         );
         
         if (isUsed) {
-            // Blok sudah digunakan - tampilkan "USED" dengan warna redup
-            DrawText("USED", blockX + 18, blockY + 20, 12, (Color){100, 100, 100, 255});
+            // Tampilkan "USED" di tengah slot
+            int textWidth = MeasureText("USED", 12);
+            DrawText("USED", 
+                slotX + (slotSize - textWidth) / 2, 
+                slotY + slotSize / 2 - 6, 
+                12, 
+                (Color){100, 100, 100, 255}
+            );
         } else if (type != -1) {
-            // Draw block preview dengan ukuran lebih besar (hanya jika belum digunakan)
-            float blockScale = 0.8f; // Meningkatkan skala blok preview
+            // Hitung bounding box dari blok untuk centering yang tepat
+            int minX = 0, maxX = 0, minY = 0, maxY = 0;
+            boolean firstTile = true;
+            
             for (int j = 0; j < MAX_BLOCK_SIZE; j++) {
-                int bx = blockX + 30 + (int)(blockShapes[type][j].x * TILE_SIZES * blockScale);
-                int by = blockY + 25 + (int)(blockShapes[type][j].y * TILE_SIZES * blockScale);
+                if (firstTile) {
+                    minX = maxX = blockShapes[type][j].x;
+                    minY = maxY = blockShapes[type][j].y;
+                    firstTile = false;
+                } else {
+                    if (blockShapes[type][j].x < minX) minX = blockShapes[type][j].x;
+                    if (blockShapes[type][j].x > maxX) maxX = blockShapes[type][j].x;
+                    if (blockShapes[type][j].y < minY) minY = blockShapes[type][j].y;
+                    if (blockShapes[type][j].y > maxY) maxY = blockShapes[type][j].y;
+                }
+            }
+            
+            // Hitung ukuran blok dan skala yang sesuai
+            int blockWidth = (maxX - minX + 1);
+            int blockHeight = (maxY - minY + 1);
+            
+            // Tentukan skala berdasarkan ukuran slot (dengan margin)
+            int availableSpace = slotSize - 20; // 10px margin di setiap sisi
+            float scaleX = (float)availableSpace / (blockWidth * TILE_SIZE);
+            float scaleY = (float)availableSpace / (blockHeight * TILE_SIZE);
+            float blockScale = (scaleX < scaleY) ? scaleX : scaleY;
+            
+            // Batasi skala maksimum
+            if (blockScale > 0.8f) blockScale = 0.8f;
+            
+            // Hitung posisi tengah blok
+            float scaledTileSize = TILE_SIZE * blockScale;
+            float totalBlockWidth = blockWidth * scaledTileSize;
+            float totalBlockHeight = blockHeight * scaledTileSize;
+            
+            int blockCenterX = slotX + slotSize / 2;
+            int blockCenterY = slotY + slotSize / 2;
+            
+            // Offset untuk centering berdasarkan bounding box
+            float offsetX = -(minX + maxX) * scaledTileSize / 2;
+            float offsetY = -(minY + maxY) * scaledTileSize / 2;
+            
+            // Draw blok dengan posisi yang sudah diperbaiki
+            for (int j = 0; j < MAX_BLOCK_SIZE; j++) {
+                float tileX = blockCenterX + offsetX + blockShapes[type][j].x * scaledTileSize;
+                float tileY = blockCenterY + offsetY + blockShapes[type][j].y * scaledTileSize;
                 
+                // Draw main tile
                 DrawRectangleRounded(
-                    (Rectangle){bx - TILE_SIZES*blockScale/2, by - TILE_SIZES*blockScale/2, TILE_SIZES*blockScale, TILE_SIZES*blockScale},
+                    (Rectangle){
+                        tileX - scaledTileSize/2, 
+                        tileY - scaledTileSize/2, 
+                        scaledTileSize, 
+                        scaledTileSize
+                    },
                     0.3f,
                     1,
                     blockColors[type-1]
                 );
                 
-                // Tambahkan efek glossy pada blok
+                // Draw glossy effect
                 DrawRectangleRounded(
                     (Rectangle){
-                        bx - TILE_SIZES*blockScale/2 + TILE_SIZES*blockScale/4, 
-                        by - TILE_SIZES*blockScale/2 + TILE_SIZES*blockScale/4, 
-                        TILE_SIZES*blockScale/2, 
-                        TILE_SIZES*blockScale/6
+                        tileX - scaledTileSize/2 + scaledTileSize/4, 
+                        tileY - scaledTileSize/2 + scaledTileSize/4, 
+                        scaledTileSize/2, 
+                        scaledTileSize/6
                     },
                     0.5f,
                     1,
@@ -548,20 +598,35 @@ void DrawNextBlocks(int selectedIndex, boolean* blockUsed){
                 );
             }
         } else {
-            // Slot kosong - tampilkan teks "EMPTY"
-            DrawText("EMPTY", blockX + 15, blockY + 20, 12, (Color){150, 150, 150, 255});
+            // Slot kosong - tampilkan "EMPTY" di tengah
+            int textWidth = MeasureText("EMPTY", 12);
+            DrawText("EMPTY", 
+                slotX + (slotSize - textWidth) / 2, 
+                slotY + slotSize / 2 - 6, 
+                12, 
+                (Color){150, 150, 150, 255}
+            );
         }
         
-        // Draw selection number di bawah blok
+        // Draw selection number di bawah slot
         Color numberColor;
         if (isUsed) {
-            numberColor = (Color){80, 80, 80, 255}; // Nomor redup untuk blok terpakai
+            numberColor = (Color){80, 80, 80, 255};
         } else if (type == -1) {
-            numberColor = (Color){100, 100, 100, 255}; // Nomor abu untuk slot kosong
+            numberColor = (Color){100, 100, 100, 255};
         } else {
-            numberColor = UI_TEXT; // Nomor normal untuk blok tersedia
+            numberColor = UI_TEXT;
         }
-        DrawText(TextFormat("%d", i+1), blockX + 25, blockY + 55, 22, numberColor);
+        
+        char numberText[8];
+        sprintf(numberText, "%d", i+1);
+        int numberWidth = MeasureText(numberText, 22);
+        DrawText(numberText, 
+            slotX + (slotSize - numberWidth) / 2, 
+            slotY + slotSize + 5, 
+            22, 
+            numberColor
+        );
     }
 }
 
