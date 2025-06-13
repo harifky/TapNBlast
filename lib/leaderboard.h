@@ -19,6 +19,15 @@ typedef struct {
     time_t timestamp; // waktu pencatatan
 } LeaderboardEntry;
 
+// Node untuk linked list leaderboard
+typedef struct LeaderboardNode {
+    LeaderboardEntry data;
+    struct LeaderboardNode* next;
+} LeaderboardNode;
+
+// Head pointer untuk linked list (global variable)
+static LeaderboardNode* leaderboardHead = NULL;
+
 // Struktur untuk state input username
 typedef struct {
     char inputText[MAX_USERNAME_LENGTH];
@@ -29,12 +38,11 @@ typedef struct {
 
 // Fungsi-fungsi leaderboard
 void InitLeaderboard();
-int LoadLeaderboard(LeaderboardEntry entries[], int maxEntries);
+void LoadLeaderboardFromFile();
 void SaveLeaderboard(LeaderboardEntry entries[], int count);
 void AddToLeaderboard(const char* username, int score, int duration);
-void SortLeaderboard(LeaderboardEntry entries[], int count);
+void SortLeaderboardList();
 int GetLeaderboardRank(int score);
-void DisplayLeaderboard(LeaderboardEntry entries[], int count);
 void FormatDuration(int seconds, char* buffer, int bufferSize);
 void ReturnToMainMenu();
 

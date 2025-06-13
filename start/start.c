@@ -1,10 +1,10 @@
 #include "start.h"
 
 void StartGame() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
-    SetTargetFPS(60);
-    srand(time(NULL));
-    InitAudioDevice();
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
+  SetTargetFPS(60);
+  srand(time(NULL));
+  InitAudioDevice();
 
     InitLeaderboard();
     Sound clickSound = LoadSound("assets/buttonfx.wav");

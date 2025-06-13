@@ -1,5 +1,46 @@
 #include "../lib/leaderboard.h"
 
+// Helper function untuk membuat node baru
+LeaderboardNode* CreateLeaderboardNode(const char* username, int score, int duration) {
+    LeaderboardNode* newNode = (LeaderboardNode*)malloc(sizeof(LeaderboardNode));
+    if (newNode == NULL) {
+        printf("Error: Memory allocation failed!\n");
+        return NULL;
+    }
+    
+    // Set data
+    strncpy(newNode->data.username, username, MAX_USERNAME_LENGTH - 1);
+    newNode->data.username[MAX_USERNAME_LENGTH - 1] = '\0';
+    newNode->data.score = score;
+    newNode->data.duration = duration;
+    newNode->data.timestamp = time(NULL);
+    newNode->next = NULL;
+    
+    return newNode;
+}
+
+// Helper function untuk menghitung jumlah node
+int CountLeaderboardNodes() {
+    int count = 0;
+    LeaderboardNode* current = leaderboardHead;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
+
+// Helper function untuk membebaskan semua node
+void FreeLeaderboardList() {
+    LeaderboardNode* current = leaderboardHead;
+    while (current != NULL) {
+        LeaderboardNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    leaderboardHead = NULL;
+}
+
 // Inisialisasi sistem leaderboard dengan format text
 void InitLeaderboard() {
     // Buat file leaderboard.txt jika belum ada
@@ -14,137 +55,246 @@ void InitLeaderboard() {
     } else {
         fclose(file);
     }
+    
+    // Load data dari file ke linked list
+    LoadLeaderboardFromFile();
 }
 
-// Load data leaderboard dari file text
-int LoadLeaderboard(LeaderboardEntry entries[], int maxEntries) {
+// Load data leaderboard dari file ke linked list
+void LoadLeaderboardFromFile() {
     FILE* file = fopen(LEADERBOARD_FILE, "r");
     if (file == NULL) {
-        return 0;
+        return;
     }
+    
+    // Free existing list first
+    FreeLeaderboardList();
     
     int count;
     if (fscanf(file, "%d", &count) != 1) {
         fclose(file);
-        return 0;
+        return;
     }
     
-    // Batasi jumlah entry yang dibaca
-    if (count > maxEntries) {
-        count = maxEntries;
-    }
-    
-    int actualRead = 0;
+    // Read each entry and add to linked list
     for (int i = 0; i < count; i++) {
-        if (fscanf(file, "%s %d %d %ld", 
-                   entries[i].username, 
-                   &entries[i].score, 
-                   &entries[i].duration, 
-                   &entries[i].timestamp) == 4) {
-            actualRead++;
+        char username[MAX_USERNAME_LENGTH];
+        int score, duration;
+        long timestamp;
+        
+        if (fscanf(file, "%s %d %d %ld", username, &score, &duration, &timestamp) == 4) {
+            LeaderboardNode* newNode = CreateLeaderboardNode(username, score, duration);
+            if (newNode != NULL) {
+                newNode->data.timestamp = timestamp; // Override dengan timestamp dari file
+                
+                // Insert at end of list (will be sorted later)
+                if (leaderboardHead == NULL) {
+                    leaderboardHead = newNode;
+                } else {
+                    LeaderboardNode* current = leaderboardHead;
+                    while (current->next != NULL) {
+                        current = current->next;
+                    }
+                    current->next = newNode;
+                }
+            }
         } else {
             break; // Stop jika ada error parsing
         }
     }
     
     fclose(file);
-    return actualRead;
+    
+    // Sort the loaded list
+    SortLeaderboardList();
 }
 
-// Simpan data leaderboard ke file text
-void SaveLeaderboard(LeaderboardEntry entries[], int count) {
+// Simpan data leaderboard dari linked list ke file text
+void SaveLeaderboardToFile() {
     FILE* file = fopen(LEADERBOARD_FILE, "w");
     if (file == NULL) {
         printf("Error: Cannot save leaderboard to file!\n");
         return;
     }
     
-    // Simpan jumlah entry di baris pertama
+    // Hitung dan simpan jumlah entry
+    int count = CountLeaderboardNodes();
     fprintf(file, "%d\n", count);
     
     // Simpan semua entry dalam format: username score duration timestamp
-    for (int i = 0; i < count; i++) {
+    LeaderboardNode* current = leaderboardHead;
+    while (current != NULL) {
         fprintf(file, "%s %d %d %ld\n", 
-                entries[i].username, 
-                entries[i].score, 
-                entries[i].duration, 
-                entries[i].timestamp);
+                current->data.username, 
+                current->data.score, 
+                current->data.duration, 
+                current->data.timestamp);
+        current = current->next;
     }
     
     fclose(file);
 }
 
-// Sorting leaderboard berdasarkan score (descending)
-void SortLeaderboard(LeaderboardEntry entries[], int count) {
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
+// Sorting leaderboard linked list berdasarkan score (descending)
+void SortLeaderboardList() {
+    if (leaderboardHead == NULL || leaderboardHead->next == NULL) {
+        return; // List kosong atau hanya 1 node
+    }
+    
+    bool swapped;
+    do {
+        swapped = false;
+        LeaderboardNode* current = leaderboardHead;
+        LeaderboardNode* prev = NULL;
+        
+        while (current->next != NULL) {
+            LeaderboardNode* nextNode = current->next;
+            
             // Sort by score (descending), jika score sama sort by duration (ascending)
-            if (entries[j].score < entries[j + 1].score || 
-                (entries[j].score == entries[j + 1].score && entries[j].duration > entries[j + 1].duration)) {
+            bool shouldSwap = (current->data.score < nextNode->data.score) ||
+                             (current->data.score == nextNode->data.score && 
+                              current->data.duration > nextNode->data.duration);
+            
+            if (shouldSwap) {
+                // Swap nodes
+                if (prev == NULL) {
+                    // Swapping head
+                    leaderboardHead = nextNode;
+                } else {
+                    prev->next = nextNode;
+                }
                 
-                LeaderboardEntry temp = entries[j];
-                entries[j] = entries[j + 1];
-                entries[j + 1] = temp;
+                current->next = nextNode->next;
+                nextNode->next = current;
+                
+                swapped = true;
+                prev = nextNode; // Update prev untuk iterasi berikutnya
+            } else {
+                prev = current;
+                current = current->next;
             }
         }
+    } while (swapped);
+}
+
+// Insert node secara terurut (alternative sorting method)
+void InsertSorted(LeaderboardNode* newNode) {
+    if (leaderboardHead == NULL || 
+        newNode->data.score > leaderboardHead->data.score ||
+        (newNode->data.score == leaderboardHead->data.score && 
+         newNode->data.duration < leaderboardHead->data.duration)) {
+        // Insert at beginning
+        newNode->next = leaderboardHead;
+        leaderboardHead = newNode;
+        return;
     }
+    
+    LeaderboardNode* current = leaderboardHead;
+    while (current->next != NULL &&
+           (current->next->data.score > newNode->data.score ||
+            (current->next->data.score == newNode->data.score &&
+             current->next->data.duration <= newNode->data.duration))) {
+        current = current->next;
+    }
+    
+    newNode->next = current->next;
+    current->next = newNode;
 }
 
 // Tambah entry baru ke leaderboard
 void AddToLeaderboard(const char* username, int score, int duration) {
-    LeaderboardEntry entries[MAX_LEADERBOARD_ENTRIES];
-    int count = LoadLeaderboard(entries, MAX_LEADERBOARD_ENTRIES);
-    
     // Validasi username - ganti spasi dengan underscore untuk format text
     char cleanUsername[MAX_USERNAME_LENGTH];
     strncpy(cleanUsername, username, MAX_USERNAME_LENGTH - 1);
     cleanUsername[MAX_USERNAME_LENGTH - 1] = '\0';
-    
+
     // Replace spaces with underscores untuk kompatibilitas format text
     for (int i = 0; cleanUsername[i] != '\0'; i++) {
         if (cleanUsername[i] == ' ') {
             cleanUsername[i] = '_';
         }
     }
-    
-    // Buat entry baru
-    LeaderboardEntry newEntry;
-    strncpy(newEntry.username, cleanUsername, MAX_USERNAME_LENGTH - 1);
-    newEntry.username[MAX_USERNAME_LENGTH - 1] = '\0';
-    newEntry.score = score;
-    newEntry.duration = duration;
-    newEntry.timestamp = time(NULL);
-    
-    // Tambahkan ke array
-    if (count < MAX_LEADERBOARD_ENTRIES) {
-        entries[count] = newEntry;
-        count++;
-    } else {
-        // Jika sudah penuh, ganti entry terakhap jika score lebih tinggi
-        entries[MAX_LEADERBOARD_ENTRIES - 1] = newEntry;
+
+    // Cek apakah username sudah ada di leaderboard
+    LeaderboardNode* current = leaderboardHead;
+    LeaderboardNode* foundNode = NULL;
+
+    while (current != NULL) {
+        if (strcmp(current->data.username, cleanUsername) == 0) {
+            foundNode = current;
+            break;
+        }
+        current = current->next;
     }
-    
-    // Sort dan simpan
-    SortLeaderboard(entries, count);
-    SaveLeaderboard(entries, count);
-    
-    // Debug: Print ke console
-    printf("Leaderboard entry added: %s, Score: %d, Duration: %d\n", 
-           cleanUsername, score, duration);
+
+    if (foundNode != NULL) {
+        // Username sudah ada, cek skor
+        if (score > foundNode->data.score) {
+            // Skor baru lebih tinggi, update entri yang ada
+            foundNode->data.score = score;
+            foundNode->data.duration = duration;
+            foundNode->data.timestamp = time(NULL); // Update timestamp
+            printf("Leaderboard entry updated for %s: New Score: %d, New Duration: %d\n",
+                   cleanUsername, score, duration);
+            SortLeaderboardList(); // Urutkan ulang setelah update
+        } else {
+            // Skor baru tidak lebih tinggi, abaikan
+            printf("Leaderboard entry for %s not updated (score not higher).\n", cleanUsername);
+        }
+    } else {
+        // Username belum ada, buat node baru dan tambahkan
+        LeaderboardNode* newNode = CreateLeaderboardNode(cleanUsername, score, duration);
+        if (newNode == NULL) {
+            return;
+        }
+
+        // Insert secara terurut
+        InsertSorted(newNode);
+
+        // Batasi jumlah entries (hapus yang terakhir jika melebihi MAX_LEADERBOARD_ENTRIES)
+        int count = CountLeaderboardNodes();
+        if (count > MAX_LEADERBOARD_ENTRIES) {
+            LeaderboardNode* current = leaderboardHead;
+            LeaderboardNode* prev = NULL;
+
+            // Cari node ke-(MAX_LEADERBOARD_ENTRIES-1)
+            for (int i = 0; i < MAX_LEADERBOARD_ENTRIES - 1 && current != NULL; i++) {
+                prev = current;
+                current = current->next;
+            }
+
+            // Hapus sisanya
+            if (prev != NULL) {
+                prev->next = NULL;
+                while (current != NULL) {
+                    LeaderboardNode* temp = current;
+                    current = current->next;
+                    free(temp);
+                }
+            }
+        }
+        printf("Leaderboard entry added: %s, Score: %d, Duration: %d\n",
+               cleanUsername, score, duration);
+    }
+
+    // Simpan ke file
+    SaveLeaderboardToFile();
 }
 
 // Dapatkan ranking berdasarkan score
 int GetLeaderboardRank(int score) {
-    LeaderboardEntry entries[MAX_LEADERBOARD_ENTRIES];
-    int count = LoadLeaderboard(entries, MAX_LEADERBOARD_ENTRIES);
+    int rank = 1;
+    LeaderboardNode* current = leaderboardHead;
     
-    for (int i = 0; i < count; i++) {
-        if (score >= entries[i].score) {
-            return i + 1;
+    while (current != NULL) {
+        if (score >= current->data.score) {
+            return rank;
         }
+        rank++;
+        current = current->next;
     }
     
-    return count + 1;
+    return rank;
 }
 
 // Format waktu untuk display
@@ -154,29 +304,23 @@ void FormatDuration(int seconds, char* buffer, int bufferSize) {
     snprintf(buffer, bufferSize, "%02d:%02d", minutes, secs);
 }
 
-// Display leaderboard (untuk debugging atau console)
-void DisplayLeaderboard(LeaderboardEntry entries[], int count) {
-    printf("\n=== LEADERBOARD ===\n");
-    printf("Rank | Username          | Score    | Time\n");
-    printf("-----|-------------------|----------|--------\n");
+// Get leaderboard data sebagai array (untuk compatibility dengan UI yang sudah ada)
+int GetLeaderboardAsArray(LeaderboardEntry entries[], int maxEntries) {
+    int count = 0;
+    LeaderboardNode* current = leaderboardHead;
     
-    for (int i = 0; i < count && i < 10; i++) {
-        char timeStr[16];
-        FormatDuration(entries[i].duration, timeStr, sizeof(timeStr));
-        
-        // Replace underscores back to spaces untuk display
-        char displayName[MAX_USERNAME_LENGTH];
-        strncpy(displayName, entries[i].username, MAX_USERNAME_LENGTH);
-        for (int j = 0; displayName[j] != '\0'; j++) {
-            if (displayName[j] == '_') {
-                displayName[j] = ' ';
-            }
-        }
-        
-        printf("%4d | %-17s | %8d | %s\n", 
-               i + 1, displayName, entries[i].score, timeStr);
+    while (current != NULL && count < maxEntries) {
+        entries[count] = current->data;
+        count++;
+        current = current->next;
     }
-    printf("\n");
+    
+    return count;
+}
+
+// Cleanup function - panggil saat program selesai
+void CleanupLeaderboard() {
+    FreeLeaderboardList();
 }
 
 // Inisialisasi input username
@@ -218,8 +362,8 @@ void UpdateUsernameInput(UsernameInput* input) {
 }
 
 void ReturnToMainMenu() {
-  // Reset semua variabel game
-  isInGameOverInput = false;
-  leaderboardSaved = false;
-  shouldReturnToMenu = true; // Set flag instead of calling StartGame
+    // Reset semua variabel game
+    isInGameOverInput = false;
+    leaderboardSaved = false;
+    shouldReturnToMenu = true; // Set flag instead of calling StartGame
 }

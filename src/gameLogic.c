@@ -2,7 +2,6 @@
 #include "../lib/global.h"
 #include "../lib/tree.h"
 
-
 void Enqueue(int blockType) {
     QueueNode *newNode = (QueueNode *)malloc(sizeof(QueueNode));
     newNode->blockType = blockType;
