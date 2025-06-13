@@ -49,6 +49,107 @@ BatchResult EvaluateBlockSequence(int initialGrid[GRID_SIZE][GRID_SIZE], int blo
     return result;
 }
 
+// Fungsi untuk mencari posisi terbaik untuk satu block
+TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int blockType) {
+    TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
+    node->blockType = blockType;
+    node->score = INT_MIN;
+    node->x = -1;
+    node->y = -1;
+    node->linesCleared = 0;
+    node->canPlace = false;
+    node->childCount = 0;
+    
+    // Inisialisasi children
+    for (int i = 0; i < 36; i++) {
+        node->children[i] = NULL;
+    }
+    
+    // Coba semua posisi yang mungkin
+    for (int y = 0; y < GRID_SIZE; y++) {
+        for (int x = 0; x < GRID_SIZE; x++) {
+            if (CanPlaceBlockOnGrid(cloneGrid, x, y, blockType)) {
+                int score = CalculateBlockScore(cloneGrid, x, y, blockType);
+                
+                if (score > node->score) {
+                    node->score = score;
+                    node->x = x;
+                    node->y = y;
+                    node->canPlace = true;
+                }
+            }
+        }
+    }
+    
+    return node;
+}
+
+// Fungsi utama untuk generate batch dengan brute force
+void GenerateBestBatchs(boolean* blockUsed) {
+    ClearQueue(); 
+
+    BatchResult bestOverallResult = {0};
+    bestOverallResult.totalScore = INT_MIN;
+    bestOverallResult.valid = false;
+
+    int initialGridState[GRID_SIZE][GRID_SIZE];
+    CloneGrid(grid, initialGridState);
+
+    // Grid tidak kosong, lakukan pencarian terbaik
+    for (int b1 = 1; b1 <= 36; b1++) {
+        for (int b2 = 1; b2 <= 18; b2++) {
+            for (int b3 = 1; b3 <= 9; b3++) {
+                BatchResult currentSequenceResult = EvaluateBlockSequence(initialGridState, b1, b2, b3);
+
+                if (currentSequenceResult.valid && currentSequenceResult.totalScore > bestOverallResult.totalScore) {
+                    bestOverallResult = currentSequenceResult;
+                }
+            }
+        }
+    }
+
+    if (bestOverallResult.valid) {
+        for (int i = 0; i < 3; i++) {
+            Enqueue(bestOverallResult.blocks[i]);
+            if (blockUsed) blockUsed[i] = false; 
+        }
+    } else {
+        printf("Info: Tidak ada kombinasi valid, menggunakan blok random.\n");
+        for (int j = 0; j < 3; j++) {
+            Enqueue(GetRandomValue(1, 36));
+            if (blockUsed) blockUsed[j] = false;
+        }
+    }
+    
+
+    // Validasi final untuk memastikan queue berisi blok yang valid
+    boolean needReset = false;
+    for (int i = 0; i < 3; i++) {
+        int queueBlock = GetQueueAt(i);
+        if (!HasValidPlacement(queueBlock)){
+
+            RemoveBlockFromQueue(queueBlock);
+            Enqueue(GetRandomValue(1,36));
+        }
+
+        if (queueBlock < 1 || queueBlock > 36) {
+            needReset = true;
+            break;
+        }
+    }
+
+    // Jika validasi gagal, reset dengan blok default
+    if (needReset) {
+        ClearQueue();
+        printf("Error: Blok tidak valid di queue. Reset dengan blok default.\n");
+        for (int j = 0; j < 3; j++) {
+            Enqueue((j % 36) + 1);
+            if (blockUsed) blockUsed[j] = false;
+        }
+    }
+}
+
+
 //fungsi untuk CloneGrid (papan permainan)
 void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE]) {
     for (int y = 0; y < GRID_SIZE; y++) {
@@ -166,41 +267,6 @@ int CalculateBlockScore(int originalGrid[GRID_SIZE][GRID_SIZE], int centerX, int
     return score;
 }
 
-// Fungsi untuk mencari posisi terbaik untuk satu block
-TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int blockType) {
-    TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
-    node->blockType = blockType;
-    node->score = INT_MIN;
-    node->x = -1;
-    node->y = -1;
-    node->linesCleared = 0;
-    node->canPlace = false;
-    node->childCount = 0;
-    
-    // Inisialisasi children
-    for (int i = 0; i < 36; i++) {
-        node->children[i] = NULL;
-    }
-    
-    // Coba semua posisi yang mungkin
-    for (int y = 0; y < GRID_SIZE; y++) {
-        for (int x = 0; x < GRID_SIZE; x++) {
-            if (CanPlaceBlockOnGrid(cloneGrid, x, y, blockType)) {
-                int score = CalculateBlockScore(cloneGrid, x, y, blockType);
-                
-                if (score > node->score) {
-                    node->score = score;
-                    node->x = x;
-                    node->y = y;
-                    node->canPlace = true;
-                }
-            }
-        }
-    }
-    
-    return node;
-}
-
 // Fungsi untuk mengecek apakah block bisa ditempatkan di grid tertentu (untuk grid clone)
 boolean CanPlaceBlockOnGrid(int testGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType) {
     if (blockType < 1 || blockType > 36) return false;
@@ -264,71 +330,6 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
             for (int y = 0; y < GRID_SIZE; y++) {
                 cloneGrid[y][x] = 0;
             }
-        }
-    }
-}
-
-// Fungsi utama untuk generate batch dengan brute force
-void GenerateBestBatchs(boolean* blockUsed) {
-    ClearQueue(); 
-
-    BatchResult bestOverallResult = {0};
-    bestOverallResult.totalScore = INT_MIN;
-    bestOverallResult.valid = false;
-
-    int initialGridState[GRID_SIZE][GRID_SIZE];
-    CloneGrid(grid, initialGridState);
-
-    // Grid tidak kosong, lakukan pencarian terbaik
-    for (int b1 = 1; b1 <= 36; b1++) {
-        for (int b2 = 1; b2 <= 18; b2++) {
-            for (int b3 = 1; b3 <= 9; b3++) {
-                BatchResult currentSequenceResult = EvaluateBlockSequence(initialGridState, b1, b2, b3);
-
-                if (currentSequenceResult.valid && currentSequenceResult.totalScore > bestOverallResult.totalScore) {
-                    bestOverallResult = currentSequenceResult;
-                }
-            }
-        }
-    }
-
-    if (bestOverallResult.valid) {
-        for (int i = 0; i < 3; i++) {
-            Enqueue(bestOverallResult.blocks[i]);
-            if (blockUsed) blockUsed[i] = false; 
-        }
-    } else {
-        printf("Info: Tidak ada kombinasi valid, menggunakan blok random.\n");
-        for (int j = 0; j < 3; j++) {
-            Enqueue(GetRandomValue(1, 36));
-            if (blockUsed) blockUsed[j] = false;
-        }
-    }
-    
-
-    // Validasi final untuk memastikan queue berisi blok yang valid
-    boolean needReset = false;
-    for (int i = 0; i < 3; i++) {
-        int queueBlock = GetQueueAt(i);
-        if (!HasValidPlacement(queueBlock)){
-
-            RemoveBlockFromQueue(queueBlock);
-            Enqueue(GetRandomValue(1,36));
-        }
-
-        if (queueBlock < 1 || queueBlock > 36) {
-            needReset = true;
-            break;
-        }
-    }
-
-    // Jika validasi gagal, reset dengan blok default
-    if (needReset) {
-        ClearQueue();
-        printf("Error: Blok tidak valid di queue. Reset dengan blok default.\n");
-        for (int j = 0; j < 3; j++) {
-            Enqueue((j % 36) + 1);
-            if (blockUsed) blockUsed[j] = false;
         }
     }
 }
