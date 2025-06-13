@@ -42,6 +42,7 @@ void LoadLeaderboardFromFile();
 void SaveLeaderboard(LeaderboardEntry entries[], int count);
 void AddToLeaderboard(const char* username, int score, int duration);
 void SortLeaderboardList();
+int GetLeaderboardAsArray(LeaderboardEntry entries[], int maxEntries);
 int GetLeaderboardRank(int score);
 void FormatDuration(int seconds, char* buffer, int bufferSize);
 void ReturnToMainMenu();

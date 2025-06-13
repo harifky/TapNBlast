@@ -94,7 +94,7 @@ void ClearFullLines(){
             }
         }
         if (full) {
-            for (int x = 0; x < GRID_SIZE; x++) grid[y][x] = 0;
+            for (int x = 0; x < GRID_SIZE; x++) EnqueueAnimation(x, y);
             clearedLines++;
             hasCleared = true;
         }
@@ -110,7 +110,7 @@ void ClearFullLines(){
             }
         }
         if (full) {
-            for (int y = 0; y < GRID_SIZE; y++) grid[y][x] = 0;
+            for (int y = 0; y < GRID_SIZE; y++) EnqueueAnimation(x, y);
             clearedLines++;
             hasCleared = true;
         }

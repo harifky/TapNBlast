@@ -99,61 +99,71 @@ void InitMainMenu() {
     menuAnimTime = 0.0f;
     titleBounce = 0.0f;
     backgroundOffset = 0.0f;
-    
-    // Initialize Play Button
+
+    // Tombol Play
     playButton = (MenuButton){
-        .rect = {SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 60, 200, 50},
-        .color = (Color){70, 130, 180, 255},      // Steel Blue
-        .hoverColor = (Color){100, 149, 237, 255}, // Cornflower Blue
-        .textColor = WHITE,
-        .animScale = 1.0f,
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 120, 200, 50},
+        .color      = (Color){70, 130, 180, 255},      // Steel Blue
+        .hoverColor = (Color){100, 149, 237, 255},     // Cornflower Blue
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
+        .text = "PLAY"
     };
-    strcpy(playButton.text, "PLAY GAME");
-    
-    // Initialize Settings Button
+
+    // Tombol Settings
     settingsButton = (MenuButton){
-        .rect = {SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 10, 200, 50},
-        .color = (Color){60, 179, 113, 255},      // Medium Sea Green
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 50, 200, 50},
+        .color      = (Color){60, 179, 113, 255},      // Medium Sea Green
         .hoverColor = (Color){90, 195, 140, 255},
-        .textColor = WHITE,
-        .animScale = 1.0f,
-        .text = "SETTING"
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
+        .text = "SETTINGS"
     };
-    
-    // Initialize About Button
+
+    // Tombol About
     aboutButton = (MenuButton){
-        .rect = {SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 80, 200, 50},
-        .color = (Color){255, 165, 0, 255},       // Orange
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 20, 200, 50},
+        .color      = (Color){255, 165, 0, 255},       // Orange
         .hoverColor = (Color){255, 185, 50, 255},
-        .textColor = WHITE,
-        .animScale = 1.0f,
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
         .text = "ABOUT"
     };
-    
-    // Initialize Exit Button
+
+    // Tombol Leaderboard
+    leaderboardButton = (MenuButton){
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 90, 200, 50},
+        .color      = (Color){180, 90, 255, 255},       // Darker Orange
+        .hoverColor = (Color){255, 165, 50, 255},
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
+        .text = "LEADERBOARD"
+    };
+
+    // Tombol Exit
     exitButton = (MenuButton){
-        .rect = {SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 150, 200, 50},
-        .color = (Color){220, 20, 60, 255},       // Crimson
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 160, 200, 50},
+        .color      = (Color){220, 20, 60, 255},       // Crimson
         .hoverColor = (Color){255, 69, 100, 255},
-        .textColor = WHITE,
-        .animScale = 1.0f,
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
         .text = "EXIT"
     };
-    
-    // Initialize Back Button
+
+    // Tombol Back (untuk sub-menu)
     backButton = (MenuButton){
-        .rect = {50, SCREEN_HEIGHT - 80, 120, 40},
-        .color = (Color){128, 128, 128, 255},     // Gray
+        .rect       = {50, SCREEN_HEIGHT - 80, 120, 40},
+        .color      = (Color){128, 128, 128, 255},     // Gray
         .hoverColor = (Color){160, 160, 160, 255},
-        .textColor = WHITE,
-        .animScale = 1.0f,
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
         .text = "BACK"
     };
-
 }
 
+
 // Update button animation and interaction
-void UpdateMenuButton(MenuButton* button, Sound clickSound) {
+void UpdateMenuButton(MenuButton* button) {
 
 
     Vector2 mousePos = GetMousePosition();
@@ -162,7 +172,7 @@ void UpdateMenuButton(MenuButton* button, Sound clickSound) {
     button->isPressed = button->isHovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
     
     if (button->isPressed && !wasPressed) {
-        PlaySound(clickSound);
+        PlayClickSound();
     }
     
     // Smooth animation
@@ -261,19 +271,22 @@ void DrawGameTitle() {
 }
 
 // Draw main menu
-void DrawMainMenu(Sound clickSound) {
+void DrawMainMenu() {
+
     DrawMenuBackground();
     DrawGameTitle();
     
     // Update and draw buttons
-    UpdateMenuButton(&playButton, clickSound);
-    UpdateMenuButton(&settingsButton, clickSound);
-    UpdateMenuButton(&aboutButton, clickSound);
-    UpdateMenuButton(&exitButton, clickSound);
+    UpdateMenuButton(&playButton);
+    UpdateMenuButton(&settingsButton);
+    UpdateMenuButton(&aboutButton);
+    UpdateMenuButton(&leaderboardButton);
+    UpdateMenuButton(&exitButton);
     
     DrawMenuButton(&playButton);
     DrawMenuButton(&settingsButton);
     DrawMenuButton(&aboutButton);
+    DrawMenuButton(&leaderboardButton);
     DrawMenuButton(&exitButton);
     
     // Draw version info
@@ -282,7 +295,7 @@ void DrawMainMenu(Sound clickSound) {
 }
 
 // Draw settings menu
-void DrawSettingsMenu(Sound clickSound) {
+void DrawSettingsMenu() {
     DrawMenuBackground();
     
     // Settings title
@@ -297,12 +310,12 @@ void DrawSettingsMenu(Sound clickSound) {
     DrawText("Difficulty: Normal", SCREEN_WIDTH/2 - 70, 290, 20, WHITE);
     DrawText("Controls: Mouse", SCREEN_WIDTH/2 - 65, 320, 20, WHITE);
     
-    UpdateMenuButton(&backButton, clickSound);
+    UpdateMenuButton(&backButton);
     DrawMenuButton(&backButton);
 }
 
 // Draw about menu
-void DrawAboutMenu(Sound clickSound) {
+void DrawAboutMenu() {
     DrawMenuBackground();
     
     // About title
@@ -322,17 +335,64 @@ void DrawAboutMenu(Sound clickSound) {
     DrawText("", SCREEN_WIDTH/2 - 0, 395, 14, WHITE);
     DrawText("Made with Raylib & C", SCREEN_WIDTH/2 - 75, 420, 14, (Color){150, 150, 150, 255});
     
-    UpdateMenuButton(&backButton, clickSound);
+    UpdateMenuButton(&backButton);
     DrawMenuButton(&backButton);
 }
 
+//leaderboard Menu
+void DrawLeaderboardMenu() {
+    DrawMenuBackground();
+
+    DrawText("LEADERBOARD", SCREEN_WIDTH / 2 - 100, 80, 36, GOLD);
+
+    // Kotak tabel
+    int startX = SCREEN_WIDTH / 2 - 200;
+    int startY = 130;
+    int rowHeight = 30;
+
+    DrawRectangleRounded((Rectangle){startX, startY, 400, 320}, 0.1f, 10, (Color){40, 40, 60, 200});
+    DrawRectangleRoundedLines((Rectangle){startX, startY, 400, 320}, 0.1f, 10, (Color){100, 100, 150, 255});
+
+    // Header tabel
+    DrawText("Rank", startX + 10, startY + 10, 18, WHITE);
+    DrawText("Name", startX + 70, startY + 10, 18, WHITE);
+    DrawText("Score", startX + 220, startY + 10, 18, WHITE);
+    DrawText("Time", startX + 310, startY + 10, 18, WHITE);
+
+    // Ambil data leaderboard
+    LeaderboardEntry entries[MAX_LEADERBOARD_ENTRIES];
+    int count = GetLeaderboardAsArray(entries, 10);
+
+    for (int i = 0; i < count; i++) {
+        char rankStr[5];
+        char scoreStr[12];
+        char timeStr[12];
+
+        sprintf(rankStr, "%d.", i + 1);
+        sprintf(scoreStr, "%d", entries[i].score);
+        FormatDuration(entries[i].duration, timeStr, sizeof(timeStr));
+
+        int y = startY + 40 + i * rowHeight;
+        DrawText(rankStr, startX + 10, y, 16, WHITE);
+        DrawText(entries[i].username, startX + 70, y, 16, WHITE);
+        DrawText(scoreStr, startX + 220, y, 16, WHITE);
+        DrawText(timeStr, startX + 310, y, 16, WHITE);
+    }
+
+    UpdateMenuButton(&backButton);
+    DrawMenuButton(&backButton);
+
+}
+
 // Main menu update and render function
-int UpdateMainMenu(Sound clickSound) {
+int UpdateMainMenu() {
     menuAnimTime += GetFrameTime();
+
     
     switch (currentMenuState) {
         case MENU_MAIN:
-            DrawMainMenu(clickSound);
+            PlayBacksoundMenu();
+            DrawMainMenu();
             
             // Handle button clicks
             if (playButton.isPressed) {
@@ -344,20 +404,29 @@ int UpdateMainMenu(Sound clickSound) {
             if (aboutButton.isPressed) {
                 currentMenuState = MENU_ABOUT;
             }
+            if (leaderboardButton.isPressed) {
+                currentMenuState = MENU_LEADER;
+            }
             if (exitButton.isPressed) {
                 return -1; // Exit game
             }
             break;
             
         case MENU_SETTINGS:
-            DrawSettingsMenu(clickSound);
+            DrawSettingsMenu();
             if (backButton.isPressed) {
                 currentMenuState = MENU_MAIN;
             }
             break;
             
         case MENU_ABOUT:
-            DrawAboutMenu(clickSound);
+            DrawAboutMenu();
+            if (backButton.isPressed) {
+                currentMenuState = MENU_MAIN;
+            }
+            break;
+        case MENU_LEADER:
+            DrawLeaderboardMenu();
             if (backButton.isPressed) {
                 currentMenuState = MENU_MAIN;
             }

@@ -4,6 +4,7 @@
 #include "global.h"
 #include "gameLogic.h"
 #include "animation.h"
+#include "sound.h"
 #include "leaderboard.h"
 #include "raylib.h"
 #include "leaderboard.h"
@@ -33,7 +34,8 @@ void drawMenu();
 typedef enum {
     MENU_MAIN,
     MENU_SETTINGS,
-    MENU_ABOUT
+    MENU_ABOUT,
+    MENU_LEADER
 } MenuState;
 
 typedef struct {
@@ -57,16 +59,18 @@ static float backgroundOffset = 0.0f;
 static MenuButton playButton;
 static MenuButton settingsButton;
 static MenuButton aboutButton;
+static MenuButton leaderboardButton;
 static MenuButton exitButton;
 static MenuButton backButton;
 
 void InitMainMenu();
-void UpdateMenuButton(MenuButton* button, Sound clickSound);
+void UpdateMenuButton(MenuButton* button);
 void DrawMenuBackground();
 void DrawGameTitle();
 void DrawMainMenu();
 void DrawSettingsMenu();
 void DrawAboutMenu();
+void DrawLeaderboardMenu();
 int UpdateMainMenu();
 
 

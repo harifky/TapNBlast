@@ -9,22 +9,26 @@ void StartGame() {
     InitAudioDevice();
 
     InitLeaderboard();
-    Sound clickSound = LoadSound("assets/buttonfx.wav");
-    SetSoundVolume(clickSound, 1.0f);
+
+    InitSounds();
+
+    
 
     while (!WindowShouldClose()) {
         InitMainMenu();
+        PlayBacksoundMenu();
+        
         shouldReturnToMenu = false;
 
         while (!WindowShouldClose() && !shouldReturnToMenu) {
             BeginDrawing();
             ClearBackground(BLACK);
-            int menuResult = UpdateMainMenu(clickSound);
+            int menuResult = UpdateMainMenu();
+            UpdateMusic();
             EndDrawing();
 
             if (menuResult == 1) break;
             if (menuResult == -1) {
-                UnloadSound(clickSound);
                 CloseAudioDevice();
                 CloseWindow();
                 return;
@@ -46,6 +50,8 @@ void StartGame() {
 
         GenerateNewBatch(blockUsed);
 
+        PlayBacksoundGame();
+
         while (selectedIndex < 3 && (GetQueueAt(selectedIndex) == -1 || blockUsed[selectedIndex])) {
             selectedIndex++;
         }
@@ -58,6 +64,8 @@ void StartGame() {
             ClearBackground(PURPLE);
 
             if (isInGameOverInput) {
+                PlayGameOverSound();
+                ClearAnimationQueue();
                 UpdateUsernameInput(&usernameInput);
                 DrawGameOverPanel(&usernameInput, score, finalGameDuration);
 
@@ -79,10 +87,11 @@ void StartGame() {
             int currentBlock = GetQueueAt(selectedIndex);
             DrawGrids();
 
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !IsAnyAnimationActive()) {
                 Vector2 m = GetMousePosition();
                 int gx = (int)((m.x - gridOriginX) / TILE_SIZE);
                 int gy = (int)((m.y - gridOriginY) / TILE_SIZE);
+                PlayPlaceBlockSound();
 
                 if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT &&
                     currentBlock >= 1 && currentBlock <= 35 && !blockUsed[selectedIndex]) {
@@ -134,15 +143,15 @@ void StartGame() {
 
 
 
-                    // Cek game over dengan validasi yang lebih ketat
-                    if (!HasAnyValidMove(blockUsed)) {
-                        GameOver = false;
-                    }
+                    // // Cek game over dengan validasi yang lebih ketat
+                    // if (!HasAnyValidMove(blockUsed)) {
+                    //     GameOver = false;
+                    // }
 
-        if (IsKeyPressed(KEY_Z)) {
-            TraceLog(LOG_INFO, "Undo button clicked");
-            PerformUndo(blockUsed);
-        }
+            if (IsKeyPressed(KEY_Z)) {
+                TraceLog(LOG_INFO, "Undo button clicked");
+                PerformUndo(blockUsed);
+            }
 
             if (IsKeyPressed(KEY_ONE)) {
                 int blockType = GetQueueAt(0);
@@ -197,12 +206,14 @@ void StartGame() {
 
             DrawScorePanel();
             DrawNextBlocks(selectedIndex, blockUsed);
+            UpdateAndDrawAnimations(GetFrameTime());
+            UpdateMusic();
 
             EndDrawing();
         }
     }
 
-    UnloadSound(clickSound);
+    UnloadSounds();
     CloseAudioDevice();
     CloseWindow();
 }
