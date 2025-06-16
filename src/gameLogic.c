@@ -1,6 +1,7 @@
 #include "../lib/gameLogic.h"
 #include "../lib/global.h"
 #include "../lib/tree.h"
+#include "../lib/animation.h"  
 
 void Enqueue(int blockType) {
     QueueNode *newNode = (QueueNode *)malloc(sizeof(QueueNode));
@@ -82,7 +83,7 @@ void ClearFullLines(){
     Sound Scoresound = LoadSound("assets/scorecoint.wav");
     
     int clearedLines = 0;
-    bool hasCleared = false;
+    boolean hasCleared = false;
     
     // Check dan clear baris penuh
     for (int y = 0; y < GRID_SIZE; y++) {
@@ -94,7 +95,10 @@ void ClearFullLines(){
             }
         }
         if (full) {
-            for (int x = 0; x < GRID_SIZE; x++) EnqueueAnimation(x, y);
+            // Gunakan animasi clear 
+            for (int x = 0; x < GRID_SIZE; x++) {
+                EnqueueClearAnimation(x, y);
+            }
             clearedLines++;
             hasCleared = true;
         }
@@ -110,7 +114,10 @@ void ClearFullLines(){
             }
         }
         if (full) {
-            for (int y = 0; y < GRID_SIZE; y++) EnqueueAnimation(x, y);
+            // Gunakan animasi clear 
+            for (int y = 0; y < GRID_SIZE; y++) {
+                EnqueueClearAnimation(x, y);
+            }
             clearedLines++;
             hasCleared = true;
         }
@@ -290,7 +297,7 @@ void GenerateNewBatch(boolean* blockUsed) {
     
     // Generate best block
     
-        GenerateBestBatch(blockUsed); //tree
+    GenerateBestBatch(blockUsed); //tree
     
     
     // Verifikasi hasil - jika gagal, fallback ke random
@@ -340,7 +347,7 @@ void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIn
     *stack = newMove;
 }
 
-bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex, boolean* isScored) {
+boolean PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex, boolean* isScored) {
     if (*stack == NULL) return false;
     Move* top = *stack;
     *blockType = top->blockType;
@@ -373,7 +380,7 @@ void RemoveBlockFromGrid(int centerX, int centerY, int blockType) {
 
 int undoCount = 0;
 
-bool PerformUndo(boolean* blockUsed) {
+boolean PerformUndo(boolean* blockUsed) {
     if (undoStack == NULL || undoCount >= 3) return false;
 
     int blockType, x, y, queueIdx;

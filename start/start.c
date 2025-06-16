@@ -66,6 +66,8 @@ void StartGame() {
 
             if (IsGridEmpty(grid)) {
                InitializeRandomGrid();
+               ClearQueue();
+               GenerateNewBatch(blockUsed);
             } 
 
             if (isInGameOverInput) {
@@ -102,7 +104,16 @@ void StartGame() {
                     currentBlock >= 1 && currentBlock <= 35 && !blockUsed[selectedIndex]) {
 
                     if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
-                    int previousScore = score;
+                        int previousScore = score;
+
+                        // Tambahkan animasi place untuk setiap bagian block yang akan ditempatkan
+                        for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
+                            int bx = gx + (int)blockShapes[currentBlock][i].x;
+                            int by = gy + (int)blockShapes[currentBlock][i].y;
+                            if (bx >= 0 && bx < GRID_SIZE && by >= 0 && by < GRID_SIZE) {
+                                EnqueuePlaceAnimation(bx, by, currentBlock);
+                            }
+                        }
 
                         PlaceBlock(gx, gy, currentBlock);
                     

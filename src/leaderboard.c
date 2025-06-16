@@ -141,7 +141,7 @@ void SortLeaderboardList() {
         return; // List kosong atau hanya 1 node
     }
     
-    bool swapped;
+    boolean swapped;
     do {
         swapped = false;
         LeaderboardNode* current = leaderboardHead;
@@ -151,7 +151,7 @@ void SortLeaderboardList() {
             LeaderboardNode* nextNode = current->next;
             
             // Sort by score (descending), jika score sama sort by duration (ascending)
-            bool shouldSwap = (current->data.score < nextNode->data.score) ||
+            boolean shouldSwap = (current->data.score < nextNode->data.score) ||
                              (current->data.score == nextNode->data.score && 
                               current->data.duration > nextNode->data.duration);
             
