@@ -3,6 +3,8 @@
 #include "../lib/leaderboard.h"
 #include "../lib/global.h"
 
+GameState currentGameState = GAME_STATE_MENU;
+
 void DrawGrids() {
     // Draw grid background
     DrawRectangleRounded(
@@ -758,4 +760,59 @@ void DrawBlockShadow(int cursorX, int cursorY, int blockType) {
             DrawLine(screenX + TILE_SIZE - 7, screenY + 5, screenX + 5, screenY + TILE_SIZE - 7, (Color){255, 255, 255, 200});
         }
     }
+}
+
+void InitPauseMenuButtons() {
+    // Tombol Lanjut
+    resumeButton = (MenuButton){
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 200, 50},
+        .color      = (Color){70, 130, 180, 255},      // Steel Blue
+        .hoverColor = (Color){100, 149, 237, 255},     // Cornflower Blue
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
+        .text = "LANJUTKAN"
+    };
+
+    // Tombol Keluar ke Menu Utama
+    quitToMenuButton = (MenuButton){
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 30, 200, 50},
+        .color      = (Color){220, 20, 60, 255},       // Crimson
+        .hoverColor = (Color){255, 69, 100, 255},
+        .textColor  = WHITE,
+        .animScale  = 1.0f,
+        .text = "KELUAR"
+    };
+}
+
+int DrawPauseMenu() {
+    // Overlay gelap
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, (Color){0, 0, 0, 150});
+
+    // Panel pop-up
+    int panelWidth = 300;
+    int panelHeight = 200;
+    int panelX = (SCREEN_WIDTH - panelWidth) / 2;
+    int panelY = (SCREEN_HEIGHT - panelHeight) / 2;
+
+    DrawRectangleRounded((Rectangle){panelX, panelY, panelWidth, panelHeight}, 0.15f, 10, (Color){40, 40, 60, 255});
+    DrawRectangleRoundedLines((Rectangle){panelX, panelY, panelWidth, panelHeight}, 0.15f, 10, (Color){200, 200, 200, 255});
+
+    // Judul
+    DrawText("PAUSE", panelX + (panelWidth / 2) - MeasureText("PAUSE", 30) / 2, panelY + 30, 30, WHITE);
+
+    // Update dan gambar tombol
+    UpdateMenuButton(&resumeButton);
+    UpdateMenuButton(&quitToMenuButton);
+
+    DrawMenuButton(&resumeButton);
+    DrawMenuButton(&quitToMenuButton);
+
+    if (resumeButton.isPressed) {
+        return 1; // Lanjutkan permainan
+    }
+    if (quitToMenuButton.isPressed) {
+        return 2; // Keluar ke menu utama (dan game over input)
+    }
+
+    return 0; // Tetap di menu pause
 }

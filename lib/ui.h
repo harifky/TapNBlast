@@ -63,6 +63,10 @@ static MenuButton leaderboardButton;
 static MenuButton exitButton;
 static MenuButton backButton;
 
+// Tambahkan tombol untuk pop-up pause menu
+static MenuButton resumeButton;
+static MenuButton quitToMenuButton;
+
 void InitMainMenu();
 void UpdateMenuButton(MenuButton* button);
 void DrawMenuBackground();
@@ -72,6 +76,10 @@ void DrawSettingsMenu();
 void DrawAboutMenu();
 void DrawLeaderboardMenu();
 int UpdateMainMenu();
+void InitPauseMenuButtons();
+int DrawPauseMenu();
+
+boolean isPaused = false;
 
 
 #endif /* UI_H */
