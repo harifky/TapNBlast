@@ -7,12 +7,8 @@ void StartGame() {
     srand(time(NULL));
 
     InitAudioDevice();
-
     InitLeaderboard();
-
     InitSounds();
-
-    
 
     while (!WindowShouldClose()) {
         InitMainMenu();
@@ -47,11 +43,13 @@ void StartGame() {
         isInGameOverInput = false;
         leaderboardSaved = false;
         score = 0;
-
+        isPaused = false; // Reset pause state
 
         GenerateNewBatch(blockUsed);
-
         PlayBacksoundGame();
+
+        // Initialize pause menu buttons
+        InitPauseMenuButtons();
 
         while (selectedIndex < 3 && (GetQueueAt(selectedIndex) == -1 || blockUsed[selectedIndex])) {
             selectedIndex++;
@@ -64,7 +62,14 @@ void StartGame() {
             BeginDrawing();
             ClearBackground(PURPLE);
 
-            if (IsGridEmpty(grid)) {
+            // Handle pause input
+            if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_ESCAPE)) {
+                if (!isInGameOverInput) {
+                    isPaused = !isPaused;
+                }
+            }
+
+            if (IsGridEmpty(grid) && !isPaused && !isInGameOverInput) {
                InitializeRandomGrid();
                ClearQueue();
                GenerateNewBatch(blockUsed);
@@ -91,6 +96,33 @@ void StartGame() {
                 continue;
             }
 
+            // Handle pause menu
+            if (isPaused) {
+                // Still draw the game state behind the pause menu
+                DrawGrids();
+                DrawScorePanel();
+                DrawNextBlocks(selectedIndex, blockUsed);
+                
+                // Draw pause menu on top
+                int pauseResult = DrawPauseMenu();
+                
+                if (pauseResult == 1) {
+                    isPaused = false; // Resume game
+                } else if (pauseResult == 2) {
+                    // Quit to menu - trigger game over input to save score
+                    time_t currentTime = time(NULL);
+                    finalGameDuration = (int)(currentTime - gameStartTime);
+                    isInGameOverInput = true;
+                    isPaused = false;
+                    InitUsernameInput(&usernameInput);
+                }
+                
+                UpdateMusic();
+                EndDrawing();
+                continue;
+            }
+
+            // Normal game logic (only when not paused)
             int currentBlock = GetQueueAt(selectedIndex);
             DrawGrids();
 
@@ -106,7 +138,7 @@ void StartGame() {
                     if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
                         int previousScore = score;
 
-                        // Tambahkan animasi place untuk setiap bagian block yang akan ditempatkan
+                        // Add place animation for each block part
                         for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
                             int bx = gx + (int)blockShapes[currentBlock][i].x;
                             int by = gy + (int)blockShapes[currentBlock][i].y;
@@ -116,14 +148,11 @@ void StartGame() {
                         }
 
                         PlaceBlock(gx, gy, currentBlock);
-                    
                         ClearFullLines();
                         boolean isScored = (score > previousScore);
                         PushMove(&undoStack, currentBlock, gx, gy, selectedIndex, isScored);
-                        // ClearStack(&undoStack);
                         undoCount = 0;  
                         blockUsed[selectedIndex] = true;
-                        // blocksUsedInBatch++;
 
                         int usedCount = 0;
                         for (int i = 0; i < 3; i++) {
@@ -131,8 +160,8 @@ void StartGame() {
                         }
 
                         if (usedCount >= 3) {
-                        ClearStack(&undoStack);
-                        undoCount = 0;
+                            ClearStack(&undoStack);
+                            undoCount = 0;
                             GenerateNewBatch(blockUsed);
                             blocksUsedInBatch = 0;
                             selectedIndex = 0;
@@ -157,18 +186,13 @@ void StartGame() {
                 }
             }
 
-
-
-                    // // Cek game over dengan validasi yang lebih ketat
-                    // if (!HasAnyValidMove(blockUsed)) {
-                    //     GameOver = false;
-                    // }
-
+            // Undo functionality
             if (IsKeyPressed(KEY_Z)) {
                 TraceLog(LOG_INFO, "Undo button clicked");
                 PerformUndo(blockUsed);
             }
 
+            // Block selection
             if (IsKeyPressed(KEY_ONE)) {
                 int blockType = GetQueueAt(0);
                 if (!blockUsed[0] && blockType >= 1 && blockType <= 35) selectedIndex = 0;
@@ -182,6 +206,7 @@ void StartGame() {
                 if (!blockUsed[2] && blockType >= 1 && blockType <= 35) selectedIndex = 2;
             }
 
+            // Game over check
             if (!GameOver && !isInGameOverInput) {
                 time_t currentTime = time(NULL);
                 finalGameDuration = (int)(currentTime - gameStartTime);
@@ -189,6 +214,7 @@ void StartGame() {
                 InitUsernameInput(&usernameInput);
             }
 
+            // Draw game elements
             Vector2 mousePos = GetMousePosition();
             int blockType = GetQueueAt(selectedIndex);
             if (blockType >= 1 && blockType <= 35 && !blockUsed[selectedIndex]) {
@@ -197,27 +223,17 @@ void StartGame() {
 
             DrawText(TextFormat("FPS: %d", GetFPS()), 10, SCREEN_HEIGHT - 25, 14, BLACK);
 
-            char batchInfo[200];
-            sprintf(batchInfo, "Batch: [%s:%d] [%s:%d] [%s:%d] - Used: %d/3 - Selected: %d",
-                    blockUsed[0] ? "Used" : "Ready", GetQueueAt(0),
-                    blockUsed[1] ? "Used" : "Ready", GetQueueAt(1),
-                    blockUsed[2] ? "Used" : "Ready", GetQueueAt(2),
-                    blocksUsedInBatch, selectedIndex + 1);
-
-            DrawScorePanel();
-            DrawNextBlocks(selectedIndex, blockUsed);
-        
-        // Tampilkan peringatan jika ada slot kosong (untuk debugging)
-        boolean hasEmptySlot = false;
-        for (int i = 0; i < 3; i++) {
-            if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 36) {
-                hasEmptySlot = true;
-                break;
+            // Debug info
+            boolean hasEmptySlot = false;
+            for (int i = 0; i < 3; i++) {
+                if (GetQueueAt(i) == -1 || GetQueueAt(i) < 1 || GetQueueAt(i) > 36) {
+                    hasEmptySlot = true;
+                    break;
+                }
             }
-        }
-        if (hasEmptySlot) {
-            DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
-        }
+            if (hasEmptySlot) {
+                DrawText("WARNING: Empty slots detected!", 10, SCREEN_HEIGHT - 65, 12, RED);
+            }
 
             DrawScorePanel();
             DrawNextBlocks(selectedIndex, blockUsed);
