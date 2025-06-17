@@ -2,7 +2,6 @@
 #include "../lib/global.h"
 #include "../lib/gameLogic.h"
 
-// Fungsi helper untuk mengecek apakah grid benar-benar kosong
 boolean IsGridEmpty(int grid[GRID_SIZE][GRID_SIZE]) {
     for (int y = 0; y < GRID_SIZE; y++) {
         for (int x = 0; x < GRID_SIZE; x++) {
@@ -14,7 +13,6 @@ boolean IsGridEmpty(int grid[GRID_SIZE][GRID_SIZE]) {
     return true;
 }
 
-// fungsi untuk generate block dan mereturn best block (3 block)
 BatchResult EvaluateBlockSequence(int initialGrid[GRID_SIZE][GRID_SIZE], int block1, int block2, int block3) {
     BatchResult result = {0};
     result.blocks[0] = block1;
@@ -49,7 +47,6 @@ BatchResult EvaluateBlockSequence(int initialGrid[GRID_SIZE][GRID_SIZE], int blo
     return result;
 }
 
-// Fungsi untuk mencari posisi terbaik untuk satu block
 TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int blockType) {
     TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
     node->blockType = blockType;
@@ -60,12 +57,10 @@ TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int bloc
     node->canPlace = false;
     node->childCount = 0;
     
-    // Inisialisasi children
     for (int i = 0; i < 36; i++) {
         node->children[i] = NULL;
     }
     
-    // Coba semua posisi yang mungkin
     for (int y = 0; y < GRID_SIZE; y++) {
         for (int x = 0; x < GRID_SIZE; x++) {
             if (CanPlaceBlockOnGrid(cloneGrid, x, y, blockType)) {
@@ -84,7 +79,6 @@ TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int bloc
     return node;
 }
 
-// Fungsi utama untuk generate batch dengan brute force
 void GenerateBestBatchs(boolean* blockUsed) {
     ClearQueue(); 
 
@@ -95,7 +89,6 @@ void GenerateBestBatchs(boolean* blockUsed) {
     int initialGridState[GRID_SIZE][GRID_SIZE];
     CloneGrid(grid, initialGridState);
 
-    // Grid tidak kosong, lakukan pencarian terbaik
     for (int b1 = 1; b1 <= 36; b1++) {
         for (int b2 = 1; b2 <= 18; b2++) {
             for (int b3 = 1; b3 <= 9; b3++) {
@@ -121,8 +114,6 @@ void GenerateBestBatchs(boolean* blockUsed) {
         }
     }
     
-
-    // Validasi final untuk memastikan queue berisi blok yang valid
     boolean needReset = false;
     for (int i = 0; i < 3; i++) {
         int queueBlock = GetQueueAt(i);
@@ -138,7 +129,6 @@ void GenerateBestBatchs(boolean* blockUsed) {
         }
     }
 
-    // Jika validasi gagal, reset dengan blok default
     if (needReset) {
         ClearQueue();
         printf("Error: Blok tidak valid di queue. Reset dengan blok default.\n");
@@ -149,8 +139,6 @@ void GenerateBestBatchs(boolean* blockUsed) {
     }
 }
 
-
-//fungsi untuk CloneGrid (papan permainan)
 void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE]) {
     for (int y = 0; y < GRID_SIZE; y++) {
         for (int x = 0; x < GRID_SIZE; x++) {
@@ -159,7 +147,6 @@ void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE])
     }
 }
 
-//fungsi untuk menghitung score dan penaltynya
 int CalculateBlockScore(int originalGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType) {
     int tempGrid[GRID_SIZE][GRID_SIZE];
     CloneGrid(originalGrid, tempGrid);
@@ -267,7 +254,6 @@ int CalculateBlockScore(int originalGrid[GRID_SIZE][GRID_SIZE], int centerX, int
     return score;
 }
 
-// Fungsi untuk mengecek apakah block bisa ditempatkan di grid tertentu (untuk grid clone)
 boolean CanPlaceBlockOnGrid(int testGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType) {
     if (blockType < 1 || blockType > 36) return false;
 
@@ -281,9 +267,7 @@ boolean CanPlaceBlockOnGrid(int testGrid[GRID_SIZE][GRID_SIZE], int centerX, int
     return true;
 }
 
-// Fungsi untuk menempatkan block di grid clone dan membersihkan lines
 void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType) {
-    // Place block
     for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
         int bx = centerX + (int)blockShapes[blockType][i].x;
         int by = centerY + (int)blockShapes[blockType][i].y;
@@ -292,7 +276,6 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
         }
     }
 
-    // Clear full rows
     for (int y = 0; y < GRID_SIZE; y++) {
         bool full = true;
         for (int x = 0; x < GRID_SIZE; x++) {
@@ -317,7 +300,6 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
         }
     }
 
-    // Clear full columns
     for (int x = 0; x < GRID_SIZE; x++) {
         bool full = true;
         for (int y = 0; y < GRID_SIZE; y++) {
@@ -355,7 +337,6 @@ TreeNode* FindBestPositionForBlock_ForAllTypes(int currentGrid[GRID_SIZE][GRID_S
     return bestNodeOverall;
 }
 
-// Fungsi utama untuk generate batch dengan decision tree
 void GenerateBestBatch(boolean* used) {
     ClearQueue();
 
@@ -366,14 +347,12 @@ void GenerateBestBatch(boolean* used) {
     int grid0[GRID_SIZE][GRID_SIZE];
     CloneGrid(grid, grid0);
 
-    // max depth = 2
     TreeNode* root0 = BuildDecisionTree(grid0, 0, 2);
 
     if (root0 != NULL && root0->childCount > 0) {
         TreeNode* best1 = NULL;
         int max1 = INT_MIN;
 
-        // Cari langkah terbaik untuk blok pertama (b1)
         for (int i = 0; i < root0->childCount; i++) {
             if (root0->children[i] && root0->children[i]->canPlace) {
                 if (root0->children[i]->score > max1) {
@@ -383,19 +362,16 @@ void GenerateBestBatch(boolean* used) {
             }
         }
 
-        // Jika ada langkah terbaik untuk b1, simpan informasinya
         if (best1) {
             best[0] = best1->blockType;
             x1 = best1->x;
             y1 = best1->y;
 
-            // Ambil langkah terbaik untuk blok kedua (b2) dari subtree b1
             if (best1->childCount > 0 && best1->children[0] && best1->children[0]->childCount > 0) {
                 TreeNode* root1 = best1->children[0];
                 TreeNode* best2 = NULL;
                 int max2 = INT_MIN;
 
-                // Cari langkah terbaik untuk b2 dari anak-anak root1
                 for (int i = 0; i < root1->childCount; i++) {
                     if (root1->children[i] && root1->children[i]->canPlace) {
                         if (root1->children[i]->score > max2) {
@@ -405,7 +381,6 @@ void GenerateBestBatch(boolean* used) {
                     }
                 }
 
-                // Simpan informasi blok kedua jika ditemukan
                 if (best2) {
                     best[1] = best2->blockType;
                     x2 = best2->x;
@@ -420,7 +395,6 @@ void GenerateBestBatch(boolean* used) {
     int simGrid[GRID_SIZE][GRID_SIZE];
     CloneGrid(grid, simGrid);
 
-    // Tempatkan blok pertama (b1)
     if (best[0] != -1) {
         PlaceBlockOnCloneGrid(simGrid, x1, y1, best[0]);
     } else {
@@ -436,7 +410,6 @@ void GenerateBestBatch(boolean* used) {
         }
     }
 
-    // Tempatkan blok kedua (b2)
     if (best[0] != -1) {
         if (best[1] != -1) {
             PlaceBlockOnCloneGrid(simGrid, x2, y2, best[1]);
@@ -454,7 +427,6 @@ void GenerateBestBatch(boolean* used) {
         }
     }
 
-    // Cari blok ketiga (b3) secara greedy
     if (best[0] != -1 && best[1] != -1) {
         printf("Info: Mencari b3 secara greedy.\n");
         TreeNode* greedy3 = FindBestPositionForBlock_ForAllTypes(simGrid);
@@ -467,7 +439,6 @@ void GenerateBestBatch(boolean* used) {
         }
     }
 
-    // Masukkan ke queue, jika tidak ada gunakan random
     for (int i = 0; i < 3; i++) {
         if (best[i] != -1) {
             Enqueue(best[i]);
@@ -478,8 +449,6 @@ void GenerateBestBatch(boolean* used) {
         if (used) used[i] = false;
     }
     
-
-    // Validasi final untuk memastikan queue berisi blok yang valid
     boolean needReset = false;
     for (int i = 0; i < 3; i++) {
         int queueBlock = GetQueueAt(i);
@@ -489,7 +458,6 @@ void GenerateBestBatch(boolean* used) {
         }
     }
 
-    // Jika validasi gagal, reset dengan blok default
     if (needReset) {
         ClearQueue();
         printf("Error: Blok tidak valid di queue. Reset dengan blok default.\n");
@@ -500,7 +468,6 @@ void GenerateBestBatch(boolean* used) {
     }
 }
 
-// Fungsi tree
 TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int maxDepth) {
     if (depth >= maxDepth) return NULL;
     
@@ -508,22 +475,18 @@ TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int 
     rootNode->childCount = 0;
     rootNode->score = INT_MIN;
     
-    // Inisialisasi children
     for (int i = 0; i < 36; i++) {
         rootNode->children[i] = NULL;
     }
     
-    // Test setiap block type
     for (int blockType = 1; blockType <= 36; blockType++) {
         TreeNode* childNode = FindBestPositionForBlock(cloneGrid, blockType);
         
         if (childNode->canPlace) {
-            // Buat clone grid untuk child
             int childGrid[GRID_SIZE][GRID_SIZE];
             CloneGrid(cloneGrid, childGrid);
             PlaceBlockOnCloneGrid(childGrid, childNode->x, childNode->y, blockType);
             
-            // Rekursi untuk level berikutnya
             TreeNode* subTree = BuildDecisionTree(childGrid, depth + 1, maxDepth);
             if (subTree != NULL) {
                 childNode->children[0] = subTree;
@@ -541,7 +504,6 @@ TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int 
     return rootNode;
 }
 
-// Fungsi untuk membersihkan memory tree
 void FreeTree(TreeNode* node) {
     if (node == NULL) return;
     
@@ -551,88 +513,3 @@ void FreeTree(TreeNode* node) {
     
     free(node);
 }
-
-// void GenerateBestBatch(boolean* blockUsed) {
-//     ClearQueue(); 
-
-//     int initialGridState[GRID_SIZE][GRID_SIZE];
-//     CloneGrid(grid, initialGridState);
-
-//     // Build decision tree dengan maxDepth = 1
-//     TreeNode* decisionTree = BuildDecisionTree(initialGridState, 0, 3);
-    
-//     if (decisionTree != NULL && decisionTree->childCount > 0) {
-//         // Cari 3 child dengan score tertinggi
-//         TreeNode* bestChildren[3] = {NULL, NULL, NULL};
-//         int bestScores[3] = {INT_MIN, INT_MIN, INT_MIN};
-        
-//         for (int i = 0; i < decisionTree->childCount; i++) {
-//             TreeNode* child = decisionTree->children[i];
-//             if (child != NULL && child->canPlace) {
-//                 int score = child->score;
-                
-//                 // Insert ke array terurut
-//                 for (int j = 0; j < 3; j++) {
-//                     if (score > bestScores[j]) {
-//                         // Geser elemen ke kanan
-//                         for (int k = 2; k > j; k--) {
-//                             bestChildren[k] = bestChildren[k-1];
-//                             bestScores[k] = bestScores[k-1];
-//                         }
-//                         bestChildren[j] = child;
-//                         bestScores[j] = score;
-//                         break;
-//                     }
-//                 }
-//             }
-//         }
-        
-//         // Enqueue 3 block terbaik
-//         for (int i = 0; i < 3; i++) {
-//             if (bestChildren[i] != NULL) {
-//                 Enqueue(bestChildren[i]->blockType);
-//                 if (blockUsed) blockUsed[i] = false;
-//             } else {
-//                 Enqueue(GetRandomValue(1, 36));
-//                 if (blockUsed) blockUsed[i] = false;
-//             }
-//         }
-        
-//         FreeTree(decisionTree);
-//     } else {
-//         // Fallback ke random jika tree gagal
-//         for (int j = 0; j < 3; j++) {
-//             Enqueue(GetRandomValue(1, 36));
-//             if (blockUsed) blockUsed[j] = false;
-//         }
-        
-//         if (decisionTree) FreeTree(decisionTree);
-//     }
-
-//     // Validasi queue
-//     for (int i = 0; i < 3; i++) {
-//         int queueBlock = GetQueueAt(i);
-//         if (queueBlock < 1 || queueBlock > 35) {
-//             ClearQueue();
-//             for (int j = 0; j < 3; j++) {
-//                 Enqueue((j % 35) + 1); 
-//                 if (blockUsed) blockUsed[j] = false;
-//             }
-//             break;
-//         }
-//     }
-// }
-
-// // Fungsi untuk print tree (debugging)
-// void PrintTree(TreeNode* node, int depth) {
-//     if (node == NULL) return;
-    
-//     for (int i = 0; i < depth; i++) printf("  ");
-//     printf("Block %d: Score %d, Pos(%d,%d), CanPlace: %s\n", 
-//            node->blockType, node->score, node->x, node->y, 
-//            node->canPlace ? "Yes" : "No");
-    
-//     for (int i = 0; i < node->childCount; i++) {
-//         PrintTree(node->children[i], depth + 1);
-//     }
-// }

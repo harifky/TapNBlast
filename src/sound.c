@@ -63,9 +63,9 @@ void PlayPlaceBlockSound(){
 }
 
 void PlayBacksoundMenu() {
-    if (isMusicOn && !IsMusicStreamPlaying(menuMusic)) {   // ← cegah restart
+    if (isMusicOn && !IsMusicStreamPlaying(menuMusic)) {
         StopBacksound();
-        PlayMusicStream(menuMusic);      // setel volume di sini
+        PlayMusicStream(menuMusic);
     }
 }
 

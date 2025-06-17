@@ -13,24 +13,26 @@
 // UI functions
 void DrawGrids();
 
-//Score
+// Score
 void DrawScorePanel();
 
 // GameOver
 void DrawGameOverPanel(UsernameInput* usernameInput, int score, int duration);
 
-// draw block preview
+// Draw Block Preview
 void DrawNextBlocks(int selectedIndex, boolean* blockUsed);
 
-//draw block shadow
+// Draw Block Shadow
 void DrawBlockShadow(int cursorX, int cursorY, int blockType);
+
+// Draw Button
 
 void drawButton(Texture2D texture, Sound sfx);
 
-//draw menu
+// Draw Menu
 void drawMenu();
 
-// Menu state
+// Menu State
 typedef enum {
     MENU_MAIN,
     MENU_SETTINGS,
@@ -49,7 +51,7 @@ typedef struct {
     float animScale;
 } MenuButton;
 
-// Menu variables
+// Menu Variables
 static MenuState currentMenuState = MENU_MAIN;
 static float menuAnimTime = 0.0f;
 static float titleBounce = 0.0f;
@@ -62,8 +64,6 @@ static MenuButton aboutButton;
 static MenuButton leaderboardButton;
 static MenuButton exitButton;
 static MenuButton backButton;
-
-// Tambahkan tombol untuk pop-up pause menu
 static MenuButton resumeButton;
 static MenuButton quitToMenuButton;
 
@@ -80,6 +80,5 @@ void InitPauseMenuButtons();
 int DrawPauseMenu();
 
 boolean isPaused = false;
-
 
 #endif /* UI_H */
