@@ -1,7 +1,9 @@
 #include "../lib/gameLogic.h"
 #include "../lib/global.h"
 #include "../lib/tree.h"
-#include "../lib/animation.h"  
+#include "../lib/animation.h"
+
+// Kontribusi: Faiz (50), Fariz (40), Rifky (10)
 
 void Enqueue(int blockType) {
     QueueNode *newNode = (QueueNode *)malloc(sizeof(QueueNode));

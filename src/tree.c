@@ -2,6 +2,8 @@
 #include "../lib/global.h"
 #include "../lib/gameLogic.h"
 
+// Kontribusi: Fariz (100)
+
 boolean IsGridEmpty(int grid[GRID_SIZE][GRID_SIZE]) {
     for (int y = 0; y < GRID_SIZE; y++) {
         for (int x = 0; x < GRID_SIZE; x++) {

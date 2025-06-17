@@ -1,5 +1,7 @@
 #include "../lib/sound.h"
 
+// Kontribusi: Fariz (100)
+
 Sound clickSound;
 Sound scoreSound;
 Sound explosionSound;

@@ -3,6 +3,8 @@
 #include "../lib/leaderboard.h"
 #include "../lib/global.h"
 
+// Kontribusi: Fariz (80), Faiz (10), Rifky (10)
+
 GameState currentGameState = GAME_STATE_MENU;
 
 void DrawGrids() {

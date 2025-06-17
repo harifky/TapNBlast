@@ -1,9 +1,6 @@
 #include "start.h"
 
-/**
- * Fungsi utama untuk memulai dan menjalankan game Tetris-like
- * Mengelola siklus hidup aplikasi: inisialisasi -> menu -> gameplay -> cleanup
- */
+// Kontribusi: Faiz, Fariz, Rifky
 void StartGame() {
     // ============================================
     // INISIALISASI APLIKASI

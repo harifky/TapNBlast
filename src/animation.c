@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+// Kontribusi: Faiz, Fariz
+
 clearAnim* clearAnimFront = NULL;
 clearAnim* clearAnimRear = NULL;
 

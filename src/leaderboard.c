@@ -1,5 +1,7 @@
 #include "../lib/leaderboard.h"
 
+// Kontribusi: Rifky (100)
+
 LeaderboardNode* CreateLeaderboardNode(const char* username, int score, int duration) {
     LeaderboardNode* newNode = (LeaderboardNode*)malloc(sizeof(LeaderboardNode));
     if (newNode == NULL) {
