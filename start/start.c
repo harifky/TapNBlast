@@ -2,7 +2,7 @@
 
 // Modifikasi fungsi StartGame - bagian yang relevan
 void StartGame() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tap N Blast");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Tddp N Blast");
     SetTargetFPS(60);
     srand(time(NULL));
 
