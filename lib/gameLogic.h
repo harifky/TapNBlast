@@ -69,8 +69,8 @@ int GetValidRandomBlockType();
 void RemoveBlockFromQueue(int index);
 
 int comboCount = 0;
-int lastClearTurn = -1;  // Turn terakhir ada clear
-int currentTurn = 0;  // Turn saat ini
+int lastClearTurn = -1;
+int currentTurn = 0;
 
 typedef struct Move {
     int blockType;
@@ -87,7 +87,6 @@ void PushMove(Move** stack, int blockType, Vector2 center, int queueIndex, bool 
 bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, bool* isScored);
 void ClearStack(Move** stack);
 boolean PerformUndo(boolean* blockUsed);
-
 void RemoveBlockFromGrid(int x, int y, int blockType);
 
 #endif

@@ -3,14 +3,14 @@
 
 #include "boolean.h"
 
-// Struktur untuk animasi clear
+// Struktur Animasi Clear
 typedef struct clearAnim {
     int x, y;
     float timer;
     struct clearAnim* next;
 } clearAnim;
 
-// Struktur untuk animasi place
+// Struktur Animasi Place
 typedef struct placeAnim {
     int x, y;
     int blockType;
@@ -18,22 +18,22 @@ typedef struct placeAnim {
     struct placeAnim* next;
 } placeAnim;
 
-// Fungsi untuk animasi clear
+// Fungsi Animasi Clear
 void EnqueueClearAnimation(int x, int y);
 void UpdateAndDrawClearAnimations(float deltaTime);
 
-// Fungsi untuk animasi place
+// Fungsi Animasi Place
 void EnqueuePlaceAnimation(int x, int y, int blockType);
 void UpdateAndDrawPlaceAnimations(float deltaTime);
 
-// Fungsi umum
+// Fungsi Umum
 void UpdateAndDrawAnimations(float deltaTime);
 boolean IsAnyAnimationActive();
 boolean IsClearAnimationActive();
 boolean IsPlaceAnimationActive();
 void ClearAnimationQueue();
     
-// Fungsi easing
+// Fungsi Easing
 float EaseOutBounce(float t);
 float EaseOutQuart(float t);
 float EaseInQuart(float t);
