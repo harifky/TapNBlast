@@ -76,7 +76,6 @@ void StartGame() {
             } 
 
             if (isInGameOverInput) {
-                PlayGameOverSound();
                 ClearAnimationQueue();
                 UpdateUsernameInput(&usernameInput);
                 DrawGameOverPanel(&usernameInput, score, finalGameDuration);
@@ -150,7 +149,9 @@ void StartGame() {
                         PlaceBlock(gx, gy, currentBlock);
                         ClearFullLines();
                         boolean isScored = (score > previousScore);
-                        PushMove(&undoStack, currentBlock, gx, gy, selectedIndex, isScored);
+                        Vector2 center = (Vector2){ gx, gy };
+                        PushMove(&undoStack, currentBlock, center, selectedIndex, isScored);
+                        // ClearStack(&undoStack);
                         undoCount = 0;  
                         blockUsed[selectedIndex] = true;
 
@@ -212,6 +213,7 @@ void StartGame() {
                 finalGameDuration = (int)(currentTime - gameStartTime);
                 isInGameOverInput = true;
                 InitUsernameInput(&usernameInput);
+                PlayGameOverSound();
             }
 
             // Draw game elements
