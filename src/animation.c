@@ -59,7 +59,7 @@ void UpdateAndDrawAnimations(float deltaTime) {
     }
 }
 
-bool IsAnyAnimationActive() {
+boolean IsAnyAnimationActive() {
     return animFront != NULL;
 }
 

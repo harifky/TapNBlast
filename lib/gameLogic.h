@@ -74,8 +74,7 @@ int currentTurn = 0;  // Turn saat ini
 
 typedef struct Move {
     int blockType;
-    int centerX;
-    int centerY;
+    Vector2 center;
     int queueIndex;
 	boolean isScored;
     struct Move* next;
@@ -84,11 +83,11 @@ typedef struct Move {
 extern Move* undoStack;
 extern int undoCount;
 
-void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex, boolean isScored);
-bool PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex, boolean* isScored);
+void PushMove(Move** stack, int blockType, Vector2 center, int queueIndex, bool isScored);
+bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, bool* isScored);
 void ClearStack(Move** stack);
 bool PerformUndo(boolean* blockUsed);
 
-void RemoveBlockFromGrid(int centerX, int centerY, int blockType);
+void RemoveBlockFromGrid(int x, int y, int blockType);
 
 #endif

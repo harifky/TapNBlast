@@ -2,10 +2,16 @@
 #define SOUND_H
 
 #include "raylib.h"
+#include "boolean.h"
+
+extern boolean isSoundOn;
+extern boolean isMusicOn;
 
 void InitSounds();
 
 void PlayClickSound();
+
+void PlayScoreSound();
 
 void PlayExplosionSound();
 

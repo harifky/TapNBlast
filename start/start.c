@@ -69,7 +69,6 @@ void StartGame() {
             } 
 
             if (isInGameOverInput) {
-                PlayGameOverSound();
                 ClearAnimationQueue();
                 UpdateUsernameInput(&usernameInput);
                 DrawGameOverPanel(&usernameInput, score, finalGameDuration);
@@ -108,7 +107,8 @@ void StartGame() {
                     
                         ClearFullLines();
                         boolean isScored = (score > previousScore);
-                        PushMove(&undoStack, currentBlock, gx, gy, selectedIndex, isScored);
+                        Vector2 center = (Vector2){ gx, gy };
+                        PushMove(&undoStack, currentBlock, center, selectedIndex, isScored);
                         // ClearStack(&undoStack);
                         undoCount = 0;  
                         blockUsed[selectedIndex] = true;
@@ -146,13 +146,6 @@ void StartGame() {
                 }
             }
 
-
-
-                    // // Cek game over dengan validasi yang lebih ketat
-                    // if (!HasAnyValidMove(blockUsed)) {
-                    //     GameOver = false;
-                    // }
-
             if (IsKeyPressed(KEY_Z)) {
                 TraceLog(LOG_INFO, "Undo button clicked");
                 PerformUndo(blockUsed);
@@ -176,6 +169,7 @@ void StartGame() {
                 finalGameDuration = (int)(currentTime - gameStartTime);
                 isInGameOverInput = true;
                 InitUsernameInput(&usernameInput);
+                PlayGameOverSound();
             }
 
             Vector2 mousePos = GetMousePosition();

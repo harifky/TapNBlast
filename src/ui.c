@@ -120,19 +120,9 @@ void InitMainMenu() {
         .text = "SETTINGS"
     };
 
-    // Tombol About
-    aboutButton = (MenuButton){
-        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 20, 200, 50},
-        .color      = (Color){255, 165, 0, 255},       // Orange
-        .hoverColor = (Color){255, 185, 50, 255},
-        .textColor  = WHITE,
-        .animScale  = 1.0f,
-        .text = "ABOUT"
-    };
-
     // Tombol Leaderboard
     leaderboardButton = (MenuButton){
-        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 90, 200, 50},
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 20, 200, 50},
         .color      = (Color){180, 90, 255, 255},       // Darker Orange
         .hoverColor = (Color){255, 165, 50, 255},
         .textColor  = WHITE,
@@ -142,7 +132,7 @@ void InitMainMenu() {
 
     // Tombol Exit
     exitButton = (MenuButton){
-        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 160, 200, 50},
+        .rect       = {SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 + 90, 200, 50},
         .color      = (Color){220, 20, 60, 255},       // Crimson
         .hoverColor = (Color){255, 69, 100, 255},
         .textColor  = WHITE,
@@ -158,6 +148,16 @@ void InitMainMenu() {
         .textColor  = WHITE,
         .animScale  = 1.0f,
         .text = "BACK"
+    };
+
+    // Tombol About
+    aboutButton = (MenuButton){
+        .rect = {SCREEN_WIDTH / 2 - 140, 350, 120, 30},
+        .color = (Color){255, 165, 0, 255},
+        .hoverColor = (Color){255, 185, 50, 255},
+        .textColor = WHITE,
+        .animScale = 1.0f,
+        .text = "ABOUT"
     };
 }
 
@@ -279,13 +279,13 @@ void DrawMainMenu() {
     // Update and draw buttons
     UpdateMenuButton(&playButton);
     UpdateMenuButton(&settingsButton);
-    UpdateMenuButton(&aboutButton);
+    // UpdateMenuButton(&aboutButton);
     UpdateMenuButton(&leaderboardButton);
     UpdateMenuButton(&exitButton);
     
     DrawMenuButton(&playButton);
     DrawMenuButton(&settingsButton);
-    DrawMenuButton(&aboutButton);
+    // DrawMenuButton(&aboutButton);
     DrawMenuButton(&leaderboardButton);
     DrawMenuButton(&exitButton);
     
@@ -304,11 +304,44 @@ void DrawSettingsMenu() {
     // Settings options (placeholder)
     DrawRectangleRounded((Rectangle){SCREEN_WIDTH/2 - 150, 200, 300, 200}, 0.1f, 10, (Color){40, 40, 60, 200});
     DrawRectangleRoundedLines((Rectangle){SCREEN_WIDTH/2 - 150, 200, 300, 200}, 0.1f, 10, (Color){100, 100, 150, 255});
+
+    Rectangle soundRect = {SCREEN_WIDTH/2 - 60, 230, 160, 25};
+    Rectangle musicRect = {SCREEN_WIDTH/2 - 60, 260, 160, 25};
     
-    DrawText("Sound: ON", SCREEN_WIDTH/2 - 40, 230, 20, WHITE);
-    DrawText("Music: ON", SCREEN_WIDTH/2 - 40, 260, 20, WHITE);
-    DrawText("Difficulty: Normal", SCREEN_WIDTH/2 - 70, 290, 20, WHITE);
-    DrawText("Controls: Mouse", SCREEN_WIDTH/2 - 65, 320, 20, WHITE);
+    Vector2 mouse = GetMousePosition();
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (CheckCollisionPointRec(mouse, soundRect)) {
+            isSoundOn = !isSoundOn;
+        } else if (CheckCollisionPointRec(mouse, musicRect)) {
+            isMusicOn = !isMusicOn;
+
+            if (!isMusicOn) {
+                StopBacksound();
+            } else {
+                // Cek state menu atau game, mainkan kembali musik yang sesuai
+                if (currentMenuState == MENU_MAIN) {
+                    PlayBacksoundMenu();
+                } else {
+                    PlayBacksoundGame();
+                }
+            }
+        }
+    }
+
+    DrawText("Sound", soundRect.x - 60, soundRect.y + 3, 20, WHITE);
+    DrawText("Music", musicRect.x - 60, musicRect.y + 3, 20, WHITE);
+    
+    DrawRectangle(soundRect.x + 140, soundRect.y + 2, 40, 20, (Color){100, 100, 100, 255});
+    DrawRectangle(isSoundOn ? soundRect.x + 162 : soundRect.x + 142, soundRect.y + 4, 16, 16, isSoundOn ? GREEN : RED);
+
+    DrawRectangle(musicRect.x + 140, musicRect.y + 2, 40, 20, (Color){100, 100, 100, 255});
+    DrawRectangle(isMusicOn ? musicRect.x + 162 : musicRect.x + 142, musicRect.y + 4, 16, 16, isMusicOn ? GREEN : RED);
+
+    UpdateMenuButton(&aboutButton);
+    DrawMenuButton(&aboutButton);
+    if (aboutButton.isPressed) {
+        currentMenuState = MENU_ABOUT;
+    }
     
     UpdateMenuButton(&backButton);
     DrawMenuButton(&backButton);
@@ -422,7 +455,7 @@ int UpdateMainMenu() {
         case MENU_ABOUT:
             DrawAboutMenu();
             if (backButton.isPressed) {
-                currentMenuState = MENU_MAIN;
+                currentMenuState = MENU_SETTINGS;
             }
             break;
         case MENU_LEADER:

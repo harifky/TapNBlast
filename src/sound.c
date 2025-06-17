@@ -1,6 +1,7 @@
 #include "../lib/sound.h"
 
 Sound clickSound;
+Sound scoreSound;
 Sound explosionSound;
 Sound gameOverSound;
 Sound placeBlockSound;
@@ -8,9 +9,13 @@ Sound placeBlockSound;
 Music menuMusic;
 Music gameMusic;
 
+boolean isSoundOn = true;
+boolean isMusicOn = true;
+
 
 void InitSounds(){
     clickSound = LoadSound("assets/buttonfx.wav");
+    scoreSound = LoadSound("assets/scorecoint.wav");
     explosionSound = LoadSound("assets/boom.mp3");
     gameOverSound = LoadSound("assets/gameOver.mp3");
     placeBlockSound = LoadSound("assets/placeBlock.wav");
@@ -18,34 +23,57 @@ void InitSounds(){
     gameMusic = LoadMusicStream("assets/backsoundGame.mp3");
 
     SetSoundVolume(clickSound, 1.0f);
+    SetSoundVolume(scoreSound, 0.6f);
     SetSoundVolume(explosionSound, 0.8f);
     SetSoundVolume(gameOverSound, 1.0f);
-    SetSoundVolume(placeBlockSound, 0.9f);
-    SetSoundVolume(placeBlockSound, 0.9f);
+    SetSoundVolume(placeBlockSound, 1.0f);
 
     SetMusicVolume(menuMusic, 1.0f);
     SetMusicVolume(gameMusic, 1.0f);
 }
 
-void PlayClickSound()        { PlaySound(clickSound); }
-void PlayExplosionSound()    { PlaySound(explosionSound); }
-void PlayGameOverSound()     { PlaySound(gameOverSound); }
-void PlayPlaceBlockSound()   { PlaySound(placeBlockSound); }
+void PlayClickSound(){     
+    if (isSoundOn) {
+        PlaySound(clickSound);
+    } 
+}
 
+void PlayScoreSound(){
+    if (isSoundOn){
+        PlaySound(scoreSound); 
+    }
+}
+
+void PlayExplosionSound(){ 
+    if (isSoundOn){
+        PlaySound(explosionSound); 
+    }
+}
+
+void PlayGameOverSound(){ 
+    if (isSoundOn){
+        PlaySound(gameOverSound); 
+    }
+}
+
+void PlayPlaceBlockSound(){
+    if (isSoundOn){
+        PlaySound(placeBlockSound); 
+    }
+}
 
 void PlayBacksoundMenu() {
-    // StopBacksound();
-    // PlayMusicStream(menuMusic);
-
-    if (!IsMusicStreamPlaying(menuMusic)) {   // ← cegah restart
+    if (isMusicOn && !IsMusicStreamPlaying(menuMusic)) {   // ← cegah restart
         StopBacksound();
         PlayMusicStream(menuMusic);      // setel volume di sini
     }
 }
 
 void PlayBacksoundGame() {
-    StopBacksound();
-    PlayMusicStream(gameMusic);
+    if (isMusicOn && !IsMusicStreamPlaying(gameMusic)){
+        StopBacksound();
+        PlayMusicStream(gameMusic);
+    }
 }
 
 void StopBacksound() {
