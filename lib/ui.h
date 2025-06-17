@@ -27,8 +27,6 @@ void DrawBlockShadow(int cursorX, int cursorY, int blockType);
 
 // Draw Button
 
-void drawButton(Texture2D texture, Sound sfx);
-
 // Draw Menu
 void drawMenu();
 
@@ -69,6 +67,7 @@ static MenuButton quitToMenuButton;
 
 void InitMainMenu();
 void UpdateMenuButton(MenuButton* button);
+void DrawMenuButton(MenuButton* button);
 void DrawMenuBackground();
 void DrawGameTitle();
 void DrawMainMenu();

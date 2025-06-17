@@ -30,8 +30,8 @@ void InitSounds(){
     SetSoundVolume(gameOverSound, 1.0f);
     SetSoundVolume(placeBlockSound, 1.0f);
 
-    SetMusicVolume(menuMusic, 1.0f);
-    SetMusicVolume(gameMusic, 1.0f);
+    SetMusicVolume(menuMusic, 0.5f);
+    SetMusicVolume(gameMusic, 0.5f);
 }
 
 void PlayClickSound(){     

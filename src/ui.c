@@ -354,23 +354,31 @@ void DrawSettingsMenu() {
 // Draw about menu
 void DrawAboutMenu() {
     DrawMenuBackground();
-    
-    // About title
+
     DrawText("ABOUT", SCREEN_WIDTH/2 - 60, 100, 36, (Color){255, 255, 255, 255});
+
+    Rectangle contentBox = {SCREEN_WIDTH/2 - 250, 150, 500, 400};
+    DrawRectangleRounded(contentBox, 0.1f, 10, (Color){30, 35, 50, 220});
+    DrawRectangleRoundedLines(contentBox, 0.1f, 10, (Color){100, 120, 180, 255});
+
+    DrawText("TAP N BLAST", SCREEN_WIDTH/2 - 80, 180, 24, (Color){255, 215, 0, 255});
+
+    int descY = 210;
+    int lineHeight = 20;
+    DrawText("adalah permainan puzzle blok yang menantang", SCREEN_WIDTH/2 - 185, descY, 16, WHITE);
+    DrawText("pemain untuk menyusun blok secara strategis", SCREEN_WIDTH/2 - 175, descY + lineHeight, 16, WHITE);
+    DrawText("untuk meraih skor setinggi mungkin.", SCREEN_WIDTH/2 - 130, descY + lineHeight * 2, 16, WHITE);
     
-    // About content
-    DrawRectangleRounded((Rectangle){SCREEN_WIDTH/2 - 200, 180, 400, 300}, 0.1f, 10, (Color){40, 40, 60, 200});
-    DrawRectangleRoundedLines((Rectangle){SCREEN_WIDTH/2 - 200, 180, 400, 300}, 0.1f, 10, (Color){100, 100, 150, 255});
-    
-    DrawText("TAP N BLAST", SCREEN_WIDTH/2 - 80, 210, 24, (Color){255, 215, 0, 255});
-    DrawText("Adalah permainan Blok", SCREEN_WIDTH/2 - 85, 240, 16, WHITE);
-    DrawText("", SCREEN_WIDTH/2 - 0, 270, 16, WHITE);
     DrawText("HOW TO PLAY:", SCREEN_WIDTH/2 - 55, 300, 18, (Color){100, 255, 100, 255});
-    DrawText("• Letakkan Blok didalam grid", SCREEN_WIDTH/2 - 90, 325, 14, WHITE);
-    DrawText("• Fill rows or columns to clear them", SCREEN_WIDTH/2 - 105, 345, 14, WHITE);
-    DrawText("• Score points and avoid game over!", SCREEN_WIDTH/2 - 105, 365, 14, WHITE);
-    DrawText("", SCREEN_WIDTH/2 - 0, 395, 14, WHITE);
-    DrawText("Made with Raylib & C", SCREEN_WIDTH/2 - 75, 420, 14, (Color){150, 150, 150, 255});
+    
+    int leftMargin = SCREEN_WIDTH/2 - 200;
+    DrawText("- Pilih Blok yang tersedia", leftMargin, 330, 14, WHITE);
+    DrawText("- Letakkan Blok di dalam grid", leftMargin, 350, 14, WHITE);
+    DrawText("- Penuhkan satu baris grid dan dapatkan Skor!", leftMargin, 370, 14, WHITE);
+    
+    DrawLineEx((Vector2){SCREEN_WIDTH/2 - 200, 400}, (Vector2){SCREEN_WIDTH/2 + 200, 400}, 1, (Color){100, 100, 150, 100});
+    
+    DrawText("Made with Raylib, C, & love", SCREEN_WIDTH/2 - 100, 420, 14, (Color){150, 150, 150, 255});
     
     UpdateMenuButton(&backButton);
     DrawMenuButton(&backButton);
