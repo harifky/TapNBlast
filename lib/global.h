@@ -47,10 +47,10 @@
 #define UI_SCORE_TEXT (Color){ 20, 80, 150, 255 }
 #define UI_PANEL (Color){ 220, 220, 230, 255 }
 
-// Grid global
+// Grid Global
 int grid[GRID_SIZE][GRID_SIZE] = {0};
 
-// Array warna dengan 40 warna unik dan bervariasi
+// Array Warna
 Color blockColors[BLOCK_TYPES] = { 
     // Baris 1: Warna dasar cerah
     (Color){ 255, 90, 90, 255 },     // Red
@@ -113,15 +113,15 @@ typedef enum {
 int gridOriginX = 25;
 int gridOriginY = 110;
 
-// Skor
+// Score
 int score = 0;
 
-// Fungsi helper untuk mendapatkan warna blok dengan aman
+// Fungsi Helper Warna Block
 static inline Color GetBlockColor(int blockType) {
     if (blockType <= 0 || blockType > BLOCK_TYPES) {
-        return GRAY; // Warna default untuk tipe tidak valid
+        return GRAY;
     }
-    return blockColors[blockType - 1]; // blockType 1-40 -> index 0-39
+    return blockColors[blockType - 1];
 }
 
 #endif

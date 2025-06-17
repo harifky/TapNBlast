@@ -23,21 +23,19 @@ void GenerateBestBatchs(boolean* blockUsed);
 void GenerateBestBatch(boolean* used);
 boolean IsGridEmpty(int grid[GRID_SIZE][GRID_SIZE]);
 
-// Fungsi pendukung
+// Fungsi Pendukung
 void CloneGrid(int source[GRID_SIZE][GRID_SIZE], int dest[GRID_SIZE][GRID_SIZE]);
 int CalculateBlockScore(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType);
 TreeNode* FindBestPositionForBlock(int cloneGrid[GRID_SIZE][GRID_SIZE], int blockType);
 boolean CanPlaceBlockOnGrid(int testGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType);
 void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int centerY, int blockType);
 
-// Fungsi tree 
+// Fungsi Tree 
 TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int maxDepth);
 void FreeTree(TreeNode* node);
 BatchResult EvaluateBlockSequence(int cloneGrid[GRID_SIZE][GRID_SIZE], int block1, int block2, int block3);
 TreeNode* FindBestPositionForBlock_ForAllTypes(int currentGrid[GRID_SIZE][GRID_SIZE]);
 
-// void PrintTree(TreeNode* node, int depth);
 int maxDepth=2;
-
 
 #endif

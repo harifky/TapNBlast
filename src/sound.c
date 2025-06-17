@@ -1,5 +1,7 @@
 #include "../lib/sound.h"
 
+// Kontribusi: Fariz (100)
+
 Sound clickSound;
 Sound scoreSound;
 Sound explosionSound;
@@ -63,9 +65,9 @@ void PlayPlaceBlockSound(){
 }
 
 void PlayBacksoundMenu() {
-    if (isMusicOn && !IsMusicStreamPlaying(menuMusic)) {   // ← cegah restart
+    if (isMusicOn && !IsMusicStreamPlaying(menuMusic)) {
         StopBacksound();
-        PlayMusicStream(menuMusic);      // setel volume di sini
+        PlayMusicStream(menuMusic);
     }
 }
 

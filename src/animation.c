@@ -4,18 +4,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-// Queue untuk animasi clear
+// Kontribusi: Faiz, Fariz
+
 clearAnim* clearAnimFront = NULL;
 clearAnim* clearAnimRear = NULL;
 
-// Queue untuk animasi place
 placeAnim* placeAnimFront = NULL;
 placeAnim* placeAnimRear = NULL;
 
-// Fungsi untuk animasi clear
 void EnqueueClearAnimation(int x, int y) {
     clearAnim* newNode = (clearAnim*)malloc(sizeof(clearAnim));
-    if (newNode == NULL) return; // Handle malloc failure
+    if (newNode == NULL) return;
     
     newNode->x = x;
     newNode->y = y;
@@ -30,10 +29,9 @@ void EnqueueClearAnimation(int x, int y) {
     }
 }
 
-// Fungsi untuk animasi place
 void EnqueuePlaceAnimation(int x, int y, int blockType) {
     placeAnim* newNode = (placeAnim*)malloc(sizeof(placeAnim));
-    if (newNode == NULL) return; // Handle malloc failure
+    if (newNode == NULL) return;
     
     newNode->x = x;
     newNode->y = y;
@@ -49,7 +47,6 @@ void EnqueuePlaceAnimation(int x, int y, int blockType) {
     }
 }
 
-// Fungsi easing untuk animasi yang lebih smooth
 float EaseOutBounce(float t) {
     if (t < 1.0f / 2.75f) {
         return 7.5625f * t * t;
@@ -84,9 +81,8 @@ void UpdateAndDrawClearAnimations(float deltaTime) {
         float progress = curr->timer / CLEAR_DURATION;
         
         if (progress <= 1.0f) {
-            // Efek dissolve dengan particle-like effect
             float alpha = 1.0f - EaseInQuart(progress);
-            float scale = 1.0f + (progress * 0.3f); // Sedikit membesar saat menghilang
+            float scale = 1.0f + (progress * 0.3f);
             
             Color color = blockColors[grid[curr->y][curr->x] - 1];
             color.a = (unsigned char)(255 * alpha);
@@ -94,15 +90,12 @@ void UpdateAndDrawClearAnimations(float deltaTime) {
             int dx = gridOriginX + curr->x * TILE_SIZE;
             int dy = gridOriginY + curr->y * TILE_SIZE;
             
-            // Hitung ukuran dan posisi dengan scaling
             int scaledSize = (int)((TILE_SIZE - 4) * scale);
             int offsetX = (TILE_SIZE - scaledSize) / 2;
             int offsetY = (TILE_SIZE - scaledSize) / 2;
             
-            // Gambar block dengan efek scaling dan fading
             DrawRectangle(dx + 2 + offsetX, dy + 2 + offsetY, scaledSize, scaledSize, color);
             
-            // Tambahkan efek glow
             if (alpha > 0.3f) {
                 Color glowColor = color;
                 glowColor.a = (unsigned char)(50 * alpha);
@@ -113,7 +106,6 @@ void UpdateAndDrawClearAnimations(float deltaTime) {
         if (curr->timer >= CLEAR_DURATION) {
             grid[curr->y][curr->x] = 0;
 
-            // Remove node dari linked list
             if (prev == NULL) {
                 clearAnim* temp = curr;
                 clearAnimFront = curr->next;
@@ -145,7 +137,6 @@ void UpdateAndDrawPlaceAnimations(float deltaTime) {
         float progress = curr->timer / PLACE_DURATION;
         
         if (progress <= 1.0f) {
-            // Efek bounce saat muncul
             float scale = EaseOutBounce(progress);
             float alpha = EaseOutQuart(progress);
             
@@ -155,15 +146,12 @@ void UpdateAndDrawPlaceAnimations(float deltaTime) {
             int dx = gridOriginX + curr->x * TILE_SIZE;
             int dy = gridOriginY + curr->y * TILE_SIZE;
             
-            // Hitung ukuran dan posisi dengan scaling
             int scaledSize = (int)((TILE_SIZE - 4) * scale);
             int offsetX = (TILE_SIZE - scaledSize) / 2;
             int offsetY = (TILE_SIZE - scaledSize) / 2;
             
-            // Gambar block dengan efek bounce
             DrawRectangle(dx + 2 + offsetX, dy + 2 + offsetY, scaledSize, scaledSize, color);
             
-            // Tambahkan efek highlight saat awal muncul
             if (progress < 0.3f) {
                 Color highlightColor = WHITE;
                 highlightColor.a = (unsigned char)(100 * (1.0f - progress / 0.3f));
@@ -172,10 +160,8 @@ void UpdateAndDrawPlaceAnimations(float deltaTime) {
         }
 
         if (curr->timer >= PLACE_DURATION) {
-            // Set block ke grid setelah animasi selesai
             grid[curr->y][curr->x] = curr->blockType;
 
-            // Remove node dari linked list
             if (prev == NULL) {
                 placeAnim* temp = curr;
                 placeAnimFront = curr->next;
@@ -214,7 +200,6 @@ boolean IsPlaceAnimationActive() {
 }
 
 void ClearAnimationQueue() {
-    // Clear semua animasi clear
     while (clearAnimFront != NULL) {
         clearAnim* temp = clearAnimFront;
         clearAnimFront = clearAnimFront->next;
@@ -222,7 +207,6 @@ void ClearAnimationQueue() {
     }
     clearAnimRear = NULL;
     
-    // Clear semua animasi place
     while (placeAnimFront != NULL) {
         placeAnim* temp = placeAnimFront;
         placeAnimFront = placeAnimFront->next;
