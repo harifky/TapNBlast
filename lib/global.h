@@ -116,9 +116,6 @@ int gridOriginY = 110;
 // Skor
 int score = 0;
 
-// External declarations (untuk file lain yang menggunakan variabel ini)
-extern int undoblocks;
-
 // Fungsi helper untuk mendapatkan warna blok dengan aman
 static inline Color GetBlockColor(int blockType) {
     if (blockType <= 0 || blockType > BLOCK_TYPES) {

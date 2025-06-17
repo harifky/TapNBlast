@@ -80,7 +80,6 @@ boolean CanPlaceBlock(int centerX, int centerY, int blockType){
 }
 
 void ClearFullLines(){
-    Sound Scoresound = LoadSound("assets/scorecoint.wav");
     
     int clearedLines = 0;
     boolean hasCleared = false;
@@ -154,7 +153,8 @@ void ClearFullLines(){
         lastClearTurn = currentTurn;
         
         // Play sound
-        PlaySound(Scoresound);
+        PlayScoreSound();
+        PlayExplosionSound();
         
         // Optional: Print info untuk debugging
         printf("Lines cleared: %d, Base score: %d, Combo: %d, Final score: %d\n", 
@@ -336,42 +336,42 @@ boolean HasAnyValidMove(boolean* blockUsed) {
 
 Move* undoStack = NULL;
 
-void PushMove(Move** stack, int blockType, int centerX, int centerY, int queueIndex, boolean isScored) {
+void PushMove(Move** stack, int blockType, Vector2 center, int queueIndex, bool isScored) {
     Move* newMove = (Move*)malloc(sizeof(Move));
     newMove->blockType = blockType;
-    newMove->centerX = centerX;
-    newMove->centerY = centerY;
+    newMove->center = center;
     newMove->queueIndex = queueIndex;
-    newMove->isScored = isScored;  // Simpan flag apakah block ini sudah memberi score
+    newMove->isScored = isScored;
     newMove->next = *stack;
     *stack = newMove;
 }
 
-boolean PopMove(Move** stack, int* blockType, int* centerX, int* centerY, int* queueIndex, boolean* isScored) {
+bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, bool* isScored) {
     if (*stack == NULL) return false;
-    Move* top = *stack;
-    *blockType = top->blockType;
-    *centerX = top->centerX;
-    *centerY = top->centerY;
-    *queueIndex = top->queueIndex;
-    *isScored = top->isScored;  // ← kembalikan flag
-    *stack = top->next;
-    free(top);
+
+    Move* temp = *stack;
+    *blockType = temp->blockType;
+    *center = temp->center;
+    *queueIndex = temp->queueIndex;
+    *isScored = temp->isScored;
+
+    *stack = temp->next;
+    free(temp);
     return true;
 }
 
 void ClearStack(Move** stack) {
     while (*stack != NULL) {
         Move* temp = *stack;
-        *stack = (*stack)->next;
+        *stack = temp->next;
         free(temp);
     }
 }
 
-void RemoveBlockFromGrid(int centerX, int centerY, int blockType) {
+void RemoveBlockFromGrid(int x, int y, int blockType) {
     for (int i = 0; i < MAX_BLOCK_SIZE; i++) {
-        int bx = centerX + (int)blockShapes[blockType][i].x;
-        int by = centerY + (int)blockShapes[blockType][i].y;
+        int bx = x + (int)blockShapes[blockType][i].x;
+        int by = y + (int)blockShapes[blockType][i].y;
         if (bx >= 0 && bx < GRID_SIZE && by >= 0 && by < GRID_SIZE) {
             grid[by][bx] = 0;
         }
@@ -383,15 +383,15 @@ int undoCount = 0;
 boolean PerformUndo(boolean* blockUsed) {
     if (undoStack == NULL || undoCount >= 3) return false;
 
-    int blockType, x, y, queueIdx;
-    boolean isScored;
-    if (PopMove(&undoStack, &blockType, &x, &y, &queueIdx, &isScored)) {
-        if (isScored) {
-            return false;
-        }
+    int blockType, queueIndex;
+    Vector2 center;
+    bool isScored;
 
-        RemoveBlockFromGrid(x, y, blockType);
-        blockUsed[queueIdx] = false;
+    if (PopMove(&undoStack, &blockType, &center, &queueIndex, &isScored)) {
+        if (isScored) return false; // Tidak bisa undo jika menghasilkan skor
+
+        RemoveBlockFromGrid((int)center.x, (int)center.y, blockType);
+        blockUsed[queueIndex] = false;
         undoCount++;
         return true;
     }
