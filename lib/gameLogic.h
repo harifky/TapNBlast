@@ -86,7 +86,7 @@ extern int undoCount;
 void PushMove(Move** stack, int blockType, Vector2 center, int queueIndex, bool isScored);
 bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, bool* isScored);
 void ClearStack(Move** stack);
-bool PerformUndo(boolean* blockUsed);
+boolean PerformUndo(boolean* blockUsed);
 
 void RemoveBlockFromGrid(int x, int y, int blockType);
 

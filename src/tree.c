@@ -529,7 +529,7 @@ TreeNode* BuildDecisionTree(int cloneGrid[GRID_SIZE][GRID_SIZE], int depth, int 
                 childNode->children[0] = subTree;
                 childNode->childCount = 1;
                 childNode->score += subTree->score;
-            }
+            } 
             
             rootNode->children[rootNode->childCount] = childNode;
             rootNode->childCount++;
