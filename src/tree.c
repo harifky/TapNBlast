@@ -359,7 +359,7 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
 
     // Clear baris penuh
     for (int y = 0; y < GRID_SIZE; y++) {
-        bool full = true;
+        boolean full = true;
         for (int x = 0; x < GRID_SIZE; x++) {
             if (cloneGrid[y][x] == 0) {
                 full = false;
@@ -367,17 +367,7 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
             }
         }
         if (full) {
-            // Turunkan baris di atasnya
-            for (int r = y; r > 0; r--) { 
-                for (int c = 0; c < GRID_SIZE; c++) {
-                    cloneGrid[r][c] = cloneGrid[r-1][c];
-                }
-            }
-            // Kosongkan baris teratas
-            for (int c = 0; c < GRID_SIZE; c++) { 
-                cloneGrid[0][c] = 0;
-            }
-            // Clear baris saat ini juga
+            // Clear baris horizontal
             for (int x = 0; x < GRID_SIZE; x++) {
                  cloneGrid[y][x] = 0;
             }
@@ -386,7 +376,7 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
 
     // Clear kolom penuh
     for (int x = 0; x < GRID_SIZE; x++) {
-        bool full = true;
+        boolean full = true;
         for (int y = 0; y < GRID_SIZE; y++) {
             if (cloneGrid[y][x] == 0) {
                 full = false;
@@ -394,12 +384,13 @@ void PlaceBlockOnCloneGrid(int cloneGrid[GRID_SIZE][GRID_SIZE], int centerX, int
             }
         }
         if (full) {
+            // clear baris vertikal
             for (int y = 0; y < GRID_SIZE; y++) {
                 cloneGrid[y][x] = 0;
             }
         }
     }
-}
+} 
 
 /**
  * Mencari posisi terbaik untuk semua tipe blok (1-36)
