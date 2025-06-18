@@ -1,6 +1,8 @@
 #ifndef START_H
 #define START_H
 
+#include "raylib.h"
+
 #include "../lib/global.h"
 #include "../lib/gameLogic.h"
 #include "../lib/ui.h"
@@ -10,7 +12,6 @@
 #include "../lib/tree.h"
 #include "../lib/leaderboard.h"
 
-
 #include "../src/animation.c"
 #include "../src/gameLogic.c"
 #include "../src/ui.c"
@@ -19,7 +20,6 @@
 #include "../src/leaderboard.c"
 
 
-#include "raylib.h"
 
 void StartGame();
 
