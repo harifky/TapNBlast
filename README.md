@@ -42,7 +42,7 @@ Jika ingin menggunakan DevC++ maka dapat dengan mengikuti langkah-langkah beriku
 * Lakukan konfigurasi raylib dengan mengikuti langkah-langkah berikut:
     * Klik menu Project > Project Option > Parameters kemudian isi bagian linker dengan -lraylib -lopengl32 -lgdi32 -lwinmm
     * Klik menu Tools > Compiler Options > Libraries Tambahkan path menuju folder lib di tempat raylib kalian disimpan. Contoh C:\raylib\w64devkit\x86_64-w64-mingw32\lib
-    * * Klik menu Tools > Compiler Options > C Includes Tambahkan path menuju folder include di tempat raylib kalian disimpan. Contoh C:\raylib\w64devkit\x86_64-w64-mingw32\include
+    *Klik menu Tools > Compiler Options > C Includes Tambahkan path menuju folder include di tempat raylib kalian disimpan. Contoh C:\raylib\w64devkit\x86_64-w64-mingw32\include
 * Lakukan compile
 * Jika sudah selesai maka file main.exe akan muncul didalam forlder TapNBlast
 
