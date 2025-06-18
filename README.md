@@ -36,7 +36,7 @@ Berikut langkah-langkah jika ingin melakukan clone pada repositori ini:
 ### Instalasi untuk menggunakan DevC++
 
 Jika ingin menggunakan DevC++ maka dapat dengan mengikuti langkah-langkah berikut:
-* Download file zip yang berisi file project untuk Devc++ dari link berikut [Folder-Aplikasi]([https://bit.ly/4kJlSN7](https://drive.google.com/drive/folders/1PUHBSH5u3RfnTUhljVtSPtplfiQoIqi_?usp=drive_link))
+* Download file zip yang berisi file project untuk Devc++ dari link berikut [Folder-Aplikasi](https://drive.google.com/drive/folders/1PUHBSH5u3RfnTUhljVtSPtplfiQoIqi_?usp=drive_link)
 * Ekstrak file zip tersebut
 * Buka file project yang telah di ekstrak menggunakan DevC++
 * Lakukan konfigurasi raylib dengan mengikuti langkah-langkah berikut:
