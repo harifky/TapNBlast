@@ -427,6 +427,7 @@ boolean HasAnyValidMove(boolean* blockUsed) {
 }
 
 // ============ SISTEM UNDO ============
+// ============ SISTEM UNDO ============
 
 Move* undoStack = NULL;  // Stack untuk menyimpan gerakan
 
@@ -457,9 +458,10 @@ void PushMove(Move** stack, int blockType, Vector2 center, int queueIndex, bool 
  * @param isScored: output status skor
  * @return: true jika berhasil, false jika stack kosong
  */
+int stacks = 4;
+
 bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, bool* isScored) {
     if (*stack == NULL) return false;  // Stack kosong
-
     // Ambil data dari top of stack
     Move* temp = *stack;
     *blockType = temp->blockType;
@@ -518,17 +520,23 @@ boolean PerformUndo(boolean* blockUsed) {
     int blockType, queueIndex;
     Vector2 center;
     bool isScored;
-
     // Pop gerakan terakhir dari stack
     if (PopMove(&undoStack, &blockType, &center, &queueIndex, &isScored)) {
         // Tidak bisa undo gerakan yang sudah menghasilkan skor
+        if (stacks < 0) return false;
+        stacks--;
         if (isScored) return false;
-
         // Hapus blok dari grid dan restore status queue
         RemoveBlockFromGrid((int)center.x, (int)center.y, blockType);
         blockUsed[queueIndex] = false;  // Mark block as unused again
         undoCount++;  // Increment undo counter
+        stacks--;
         return true;
     }
     return false;
+}
+
+void ResetUndoSystem() {
+    stacks = 4;
+    ClearStack(&undoStack);
 }

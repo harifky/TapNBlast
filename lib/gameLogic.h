@@ -88,5 +88,6 @@ bool PopMove(Move** stack, int* blockType, Vector2* center, int* queueIndex, boo
 void ClearStack(Move** stack);
 boolean PerformUndo(boolean* blockUsed);
 void RemoveBlockFromGrid(int x, int y, int blockType);
+void ResetUndoSystem();
 
 #endif

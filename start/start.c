@@ -78,6 +78,8 @@ void StartGame() {
 
         // Setup grid awal
         InitializeRandomGrid();
+        ClearQueue();
+        GenerateNewBatch(blockUsed);
 
         // ============================================
         // MAIN GAME LOOP
@@ -100,6 +102,7 @@ void StartGame() {
                InitializeRandomGrid();
                ClearQueue();
                GenerateNewBatch(blockUsed);
+               ResetUndoSystem();
             } 
 
             // ============================================
@@ -107,6 +110,7 @@ void StartGame() {
             // ============================================
             if (isInGameOverInput) {
                 // Bersihkan animasi dan handle input username
+                ResetUndoSystem();
                 ClearAnimationQueue();
                 UpdateUsernameInput(&usernameInput);
                 DrawGameOverPanel(&usernameInput, score, finalGameDuration);
