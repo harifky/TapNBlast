@@ -177,7 +177,7 @@ void StartGame() {
 
                 // Validasi posisi dan block
                 if (gx >= 0 && gx < GRID_WIDTH && gy >= 0 && gy < GRID_HEIGHT &&
-                    currentBlock >= 1 && currentBlock <= 35 && !blockUsed[selectedIndex]) {
+                    currentBlock >= 1 && currentBlock <= 36 && !blockUsed[selectedIndex]) {
 
                     // Cek apakah block bisa ditempatkan di posisi tersebut
                     if (CanPlaceBlock(gx, gy, currentBlock) && GameOver) {
@@ -225,9 +225,9 @@ void StartGame() {
                             do {
                                 nextIndex = (nextIndex + 1) % 3;
                                 attempts++;
-                            } while (attempts < 3 && (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 || GetQueueAt(nextIndex) > 35));
+                            } while (attempts < 3 && (blockUsed[nextIndex] || GetQueueAt(nextIndex) < 1 || GetQueueAt(nextIndex) > 36));
                             
-                            if (attempts < 3 && !blockUsed[nextIndex] && GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 35) {
+                            if (attempts < 3 && !blockUsed[nextIndex] && GetQueueAt(nextIndex) >= 1 && GetQueueAt(nextIndex) <= 36) {
                                 selectedIndex = nextIndex;
                             }
                         }
@@ -254,15 +254,15 @@ void StartGame() {
             // Block selection shortcuts (1, 2, 3 keys)
             if (IsKeyPressed(KEY_ONE)) {
                 int blockType = GetQueueAt(0);
-                if (!blockUsed[0] && blockType >= 1 && blockType <= 35) selectedIndex = 0;
+                if (!blockUsed[0] && blockType >= 1 && blockType <= 36) selectedIndex = 0;
             }
             if (IsKeyPressed(KEY_TWO)) {
                 int blockType = GetQueueAt(1);
-                if (!blockUsed[1] && blockType >= 1 && blockType <= 35) selectedIndex = 1;
+                if (!blockUsed[1] && blockType >= 1 && blockType <= 36) selectedIndex = 1;
             }
             if (IsKeyPressed(KEY_THREE)) {
                 int blockType = GetQueueAt(2);
-                if (!blockUsed[2] && blockType >= 1 && blockType <= 35) selectedIndex = 2;
+                if (!blockUsed[2] && blockType >= 1 && blockType <= 36) selectedIndex = 2;
             }
 
             // --- GAME OVER CHECK ---
@@ -280,7 +280,7 @@ void StartGame() {
             // Draw shadow block di posisi mouse
             Vector2 mousePos = GetMousePosition();
             int blockType = GetQueueAt(selectedIndex);
-            if (blockType >= 1 && blockType <= 35 && !blockUsed[selectedIndex]) {
+            if (blockType >= 1 && blockType <= 36 && !blockUsed[selectedIndex]) {
                 DrawBlockShadow((int)mousePos.x, (int)mousePos.y, blockType);
             }
 
