@@ -415,15 +415,17 @@ void DrawAboutMenu() {
     DrawText("HOW TO PLAY:", SCREEN_WIDTH/2 - 55, 300, 18, (Color){100, 255, 100, 255});
     
     int leftMargin = SCREEN_WIDTH/2 - 200;
-    DrawText("- Pilih Blok yang tersedia", leftMargin, 330, 14, WHITE);
+    DrawText("- Pilih Blok yang tersedia menggunakan nomor 1/2/3", leftMargin, 330, 14, WHITE);
     DrawText("- Letakkan Blok di dalam grid", leftMargin, 350, 14, WHITE);
-    DrawText("- Penuhkan satu baris grid dan dapatkan Skor!", leftMargin, 370, 14, WHITE);
+    DrawText("- Kembalikan aksi dengan menekan tombol 'Z'", leftMargin, 370, 14, WHITE);
+    DrawText("- Penuhkan satu baris grid dan dapatkan Skor!", leftMargin, 390, 14, WHITE);
+    DrawText("- Jeda permainan dengan menekan tombol 'P'", leftMargin, 410, 14, WHITE);
     
     // Garis pemisah
-    DrawLineEx((Vector2){SCREEN_WIDTH/2 - 200, 400}, (Vector2){SCREEN_WIDTH/2 + 200, 400}, 1, (Color){100, 100, 150, 100});
+    DrawLineEx((Vector2){SCREEN_WIDTH/2 - 200, 400}, (Vector2){SCREEN_WIDTH/2 + 200, 420}, 1, (Color){100, 100, 150, 100});
     
     // Credit
-    DrawText("Made with Raylib, C, & love", SCREEN_WIDTH/2 - 100, 420, 14, (Color){150, 150, 150, 255});
+    DrawText("Made with Raylib, C, & love", SCREEN_WIDTH/2 - 100, 440, 14, (Color){150, 150, 150, 255});
     
     UpdateMenuButton(&backButton);
     DrawMenuButton(&backButton);
